@@ -1,13 +1,10 @@
-const container = document.querySelector('#list');
-
 let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation'];
 
-let talk_info = {}, global_data;
+let talk_info = {}, global_data, current_selection = undefined;
 
-let current_selection = undefined;
+let server_list = ['http://10.206.32.47:9202', 'http://82.156.12.45:9202'], server_addr;
 
-let server_addr = 'http://10.206.32.47:8888';
-// let server_addr = 'http://127.0.0.1:8888';
+let fetch_interval_id;
 
 function update_abs_and_bio() {
   let s = cherry.getValue();
@@ -33,55 +30,40 @@ function push_data() {
   });
 }
 
-let activated = false;
+let mon_tab_changes = false;
 
-function fetch_data() {
-  activated = false;
+function load_data(data) {
+  mon_tab_changes = false;
+  global_data = JSON.parse(data);
+  for (let i in global_data) {
+    for (let j in talk_list_header) {
+      let x = parseInt(i) + 1, y = parseInt(j);
+      if (hot.getDataAtCell(x, y) !== global_data[i][talk_list_header[j]]) {
+        hot.setDataAtCell(x, y, global_data[i][talk_list_header[j]]);
+      }
+    }
+  }
+  mon_tab_changes = true;
+}
+
+function fetch_data(callback) {
   $.ajax({
     url: server_addr + '/fetch',
     type: 'POST',
-    success: function (data) {
-      let initial = global_data === undefined;
-      global_data = JSON.parse(data);
-
-      for (let i in global_data) {
-        for (let j in talk_list_header) {
-          let x = parseInt(i) + 1, y = parseInt(j);
-          if (hot.getDataAtCell(x, y) !== global_data[i][talk_list_header[j]]) {
-            hot.setDataAtCell(x, y, global_data[i][talk_list_header[j]]);
-          }
-        }
-      }
-      if (initial) {
-        let next = -1;
-        for (let i in global_data) {
-          if (Date.parse(global_data[i]["date"]) > Date.now()) {
-            next = parseInt(i) + 1;
-            break;
-          }
-        }
-        if (next !== -1) {
-          hot.scrollViewportTo(Math.max(0, next - 4), 0);
-        }
-      }
-      activated = true;
-      // let last = parseInt(global_data[global_data.length - 1]['id']);
-      // for (let i = 0; i < 20; ++i) {
-      //   hot.setDataAtCell(i + global_data.length, 0, (last + i).toString());
-      // }
+    success: (data) => {
+      load_data(data);
+      if (callback) callback();
     },
-    error: function (data) {
+    error: (request, status, error) => {
+      console.log(error);
       alert('网络错误，请联系路已人');
-      clearInterval();
+      clearInterval(fetch_interval_id);
     },
     data: {},
   });
 }
 
-// setInterval(fetch_data, 500);
-
-
-const hot = new Handsontable(container, {
+const hot = new Handsontable(document.querySelector('#list'), {
   data: [talk_list_header],
   minCols: talk_list_header.length,
   rowHeaders: true,
@@ -112,7 +94,7 @@ const hot = new Handsontable(container, {
     $('#info-sec').css("visibility", "visible");
   },
   afterChange: (changes) => {
-    if (activated) {
+    if (mon_tab_changes) {
       changes?.forEach(([row, col, oldValue, newValue]) => {
         // Some logic...
         global_data[row - 1][talk_list_header[col]] = newValue;
@@ -123,8 +105,42 @@ const hot = new Handsontable(container, {
   }
 });
 
-// setInterval(() => { let x = Math.round(Math.random() * 20); hot.setDataAtCell(x, 0, Math.random()); }, 1000)
-fetch_data();
+function init() {
+  function scroll_to_lastest() {
+    let next = -1;
+    for (let i in global_data) {
+      if (Date.parse(global_data[i]["date"]) > Date.now()) {
+        next = parseInt(i) + 1;
+        break;
+      }
+    }
+    if (next !== -1) {
+      hot.scrollViewportTo(Math.max(0, next - 4), 0);
+    }
+  }
+
+  server_addr = server_list[0];
+  $.ajax({
+    url: server_addr + '/fetch',
+    type: 'POST',
+    success: (data) => {
+      console.log('in ICT');
+      load_data(data);
+      scroll_to_lastest();
+      fetch_interval_id = setInterval(fetch_data, 5000);
+    },
+    error: (data) => {
+      console.log('out of ICT');
+      server_addr = server_list[1];
+      fetch_data(scroll_to_lastest);
+      fetch_interval_id = setInterval(fetch_data, 5000);
+    },
+    timeout: 1000,
+    data: {},
+  });
+}
+
+init();
 
 let cherry = new Cherry({
   id: 'markdown-container',
@@ -228,7 +244,7 @@ function start_generate(type) {
     $.ajax({
       url: server_addr + '/start-generate',
       type: 'POST',
-      data: { type: type, id: global_data[current_selection]['id'] },
+      data: { type: type, id: global_data[current_selection]['id'], hdr_fs: $('#hdr-fs').val() },
       success: function (data) {
         if (data === "started") {
           alert("generating started");
