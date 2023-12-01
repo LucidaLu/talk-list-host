@@ -8,16 +8,6 @@ let server_list = [
 
 let fetch_interval_id;
 
-function update_abs_and_bio() {
-  let s = cherry.getValue();
-  let arr = s.split('===');
-  console.log(arr[0]);
-  global_data[current_selection]["title"] = arr[0].substring(1).trim();
-  global_data[current_selection]["abstract"] = arr[1].trim();
-  global_data[current_selection]["bio"] = arr[2].trim();
-  console.log(global_data[current_selection]);
-}
-
 function push_data() {
   $.ajax({
     url: server_addr + '/push',
@@ -30,6 +20,17 @@ function push_data() {
       console.log(data);
     }
   });
+}
+
+function update_abs_and_bio() {
+  let s = cherry.getValue();
+  let arr = s.split('===');
+  console.log(arr[0]);
+  global_data[current_selection]["title"] = arr[0].substring(1).trim();
+  global_data[current_selection]["abstract"] = arr[1].trim();
+  global_data[current_selection]["bio"] = arr[2].trim();
+  console.log(global_data[current_selection]);
+  push_data();
 }
 
 let mon_tab_changes = false;
