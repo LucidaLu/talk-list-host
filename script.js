@@ -1,6 +1,6 @@
 let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation'];
 
-let talk_info = {}, global_data, current_selection = undefined;
+let talk_info = {}, meta_data = [], aux_data = {}, current_selection = undefined;
 
 let server_list = [
   //'http://127.0.0.1:9202', 
@@ -9,10 +9,17 @@ let server_list = [
 let fetch_interval_id;
 
 function push_data() {
+  let data = [];
+  for (let i of meta_data) {
+    item = {};
+    for (let j in talk_list_header)
+      item[talk_list_header[j]] = i[j];
+    data.push(Object.assign(item, aux_data[item["id"]]));
+  }
   $.ajax({
     url: server_addr + '/push',
     type: 'POST',
-    data: JSON.stringify(global_data),
+    data: JSON.stringify(data),
     success: function (data) {
       console.log(data);
     },
@@ -26,10 +33,10 @@ function update_abs_and_bio() {
   let s = cherry.getValue();
   let arr = s.split('===');
   console.log(arr[0]);
-  global_data[current_selection]["title"] = arr[0].substring(1).trim();
-  global_data[current_selection]["abstract"] = arr[1].trim();
-  global_data[current_selection]["bio"] = arr[2].trim();
-  console.log(global_data[current_selection]);
+  aux_data[meta_data[current_selection][0]]["title"] = arr[0].substring(1).trim();
+  aux_data[meta_data[current_selection][0]]["abstract"] = arr[1].trim();
+  aux_data[meta_data[current_selection][0]]["bio"] = arr[2].trim();
+  console.log(meta_data[current_selection]);
   push_data();
 }
 
@@ -37,12 +44,25 @@ let mon_tab_changes = false;
 
 function load_data(data) {
   mon_tab_changes = false;
-  global_data = JSON.parse(data);
-  for (let i in global_data) {
+  data = JSON.parse(data);
+  meta_data = new Array(data.length);
+  aux_data = {};
+  for (let i in data) {
+    meta_data[i] = new Array(talk_list_header.length);
+    for (let j in talk_list_header)
+      meta_data[i][j] = data[i][talk_list_header[j]];
+    aux_data[data[i]["id"]] = {
+      "title": data[i]["title"],
+      "abstract": data[i]["abstract"],
+      "bio": data[i]["bio"],
+      "pic": data[i]["pic"]
+    };
+  }
+  for (let i in meta_data) {
     for (let j in talk_list_header) {
       let x = parseInt(i) + 1, y = parseInt(j);
-      if (hot.getDataAtCell(x, y) !== global_data[i][talk_list_header[j]]) {
-        hot.setDataAtCell(x, y, global_data[i][talk_list_header[j]]);
+      if (hot.getDataAtCell(x, y) !== meta_data[i][j]) {
+        hot.setDataAtCell(x, y, meta_data[i][j]);
       }
     }
   }
@@ -78,13 +98,14 @@ const hot = new Handsontable(document.querySelector('#list'), {
     let i = row - 1;
     if (current_selection != i) {
       $('#profile-pic').attr("src", "");
-      if (global_data && (i in global_data)) {
+      if (meta_data && (i in meta_data)) {
         current_selection = i;
-        let s = `# ${global_data[i]["title"]}\n\n===\n\n`;
-        s += global_data[i]["abstract"] + '\n\n===\n\n' + global_data[i]["bio"];
+        let cur_id = meta_data[i][0];
+        let s = `# ${aux_data[cur_id]["title"]}\n\n===\n\n`;
+        s += aux_data[cur_id]["abstract"] + '\n\n===\n\n' + aux_data[cur_id]["bio"];
         cherry.setValue(s);
 
-        $('#profile-pic').attr("src", global_data[i]["pic"]);
+        $('#profile-pic').attr("src", aux_data[cur_id]["pic"]);
       } else {
         current_selection = undefined;
         cherry.setValue("");
@@ -100,9 +121,9 @@ const hot = new Handsontable(document.querySelector('#list'), {
     if (mon_tab_changes) {
       changes?.forEach(([row, col, oldValue, newValue]) => {
         // Some logic...
-        global_data[row - 1][talk_list_header[col]] = newValue;
+        meta_data[row - 1][talk_list_header[col]] = newValue;
       });
-      console.log(global_data);
+      console.log(meta_data);
       push_data();
     }
   }
@@ -111,8 +132,8 @@ const hot = new Handsontable(document.querySelector('#list'), {
 function init() {
   function scroll_to_lastest() {
     let next = -1;
-    for (let i in global_data) {
-      if (Date.parse(global_data[i]["date"]) > Date.now()) {
+    for (let i in meta_data) {
+      if (Date.parse(meta_data[i][2]) > Date.now()) {
         next = parseInt(i) + 1;
         break;
       }
@@ -130,13 +151,13 @@ function init() {
       console.log('in ICT');
       load_data(data);
       scroll_to_lastest();
-      fetch_interval_id = setInterval(fetch_data, 5000);
+      // fetch_interval_id = setInterval(fetch_data, 5000);
     },
     error: (data) => {
       console.log('out of ICT');
       server_addr = server_list[1];
       fetch_data(scroll_to_lastest);
-      fetch_interval_id = setInterval(fetch_data, 5000);
+      // fetch_interval_id = setInterval(fetch_data, 5000);
     },
     timeout: 1000,
     data: {},
@@ -226,7 +247,7 @@ $('#file').change(function () {
     success: function (data) {
       $('#profile-pic').attr("src", data);
       if (current_selection !== undefined) {
-        global_data[current_selection]["pic"] = data;
+        aux_data[meta_data[current_selection][0]]["pic"] = data;
         push_data();
       }
       $('#file').val('');
@@ -250,7 +271,7 @@ function start_generate(type) {
       type: 'POST',
       data: {
         type: type,
-        id: global_data[current_selection]['id'],
+        id: aux_data[meta_data[current_selection][0]]['id'],
         tit_fs: $('#tit-fs').val(),
         txt_fs: $('#txt-fs').val(),
         bio_mode: $('input[name="inlineRadioOptions"]:checked').val()
@@ -275,7 +296,7 @@ function get_stat(type) {
     $.ajax({
       url: server_addr + '/get-stat',
       type: 'POST',
-      data: { type: type, id: global_data[current_selection]['id'] },
+      data: { type: type, id: meta_data[current_selection][0] },
       success: function (data) {
         alert(`generation status:\n\n${data}`);
       },
@@ -291,10 +312,10 @@ function download(type) {
     $.ajax({
       url: server_addr + `/ready`,
       type: 'POST',
-      data: { id: global_data[current_selection]['id'], type: type },
+      data: { id: meta_data[current_selection][0], type: type },
       success: function (data) {
         if (data === "ready") {
-          window.location.href = server_addr + `/download-${type}?id=${global_data[current_selection]['id']}`;
+          window.location.href = server_addr + `/download-${type}?id=${meta_data[current_selection][0]}`;
         } else {
           alert('not ready yet');
         }
