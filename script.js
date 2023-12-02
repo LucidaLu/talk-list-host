@@ -294,7 +294,7 @@ function download(type) {
       data: { id: global_data[current_selection]['id'], type: type },
       success: function (data) {
         if (data === "ready") {
-          window.location.href = server_addr + `/download-${type}?id=${global_data[current_selection]['id']}`;
+          window.open(server_addr + `/download-${type}?id=${global_data[current_selection]['id']}`);
         } else {
           alert('not ready yet');
         }
