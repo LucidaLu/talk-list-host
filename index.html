@@ -12,8 +12,8 @@
       left: 0;
       right: 0;
       margin: auto;
-      /* max-width: 90vw; */
-      min-width: 80vw;
+      max-width: 80vw !important;
+      /* min-width: 80vw !important; */
       height: 100vh;
       /* text-align: center; */
       color: rgb(119, 66, 141);
@@ -86,6 +86,20 @@
       font-size: 12px !important;
       padding: 5px !important;
     }
+
+    #left-banner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 10vw;
+      height: 100vh;
+    }
+
+    #left-banner-text {
+      color: rgb(119, 66, 141);
+      /* transform: rotate(-90deg); */
+      font-size: 40px;
+    }
   </style>
   <link href="assets/bootstrap.min.css" rel="stylesheet">
   <link href="assets/cherry/cherry-markdown.min.css" rel="stylesheet" />
@@ -94,9 +108,15 @@
 </head>
 
 <body>
+  <div id="left-banner">
+    <div id="left-banner-text">
+      QUACT TALKS
+    </div>
+  </div>
+
   <div class="display-area container">
     <div id="list-wrapper" class="row">
-      <!-- <h1>QuACT Talks</h1> -->
+      <!--  -->
       <div class="col-6">
         <div id="list"></div>
       </div>
