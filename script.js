@@ -1,6 +1,6 @@
 let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation'];
 
-let talk_info = {}, meta_data = [], aux_data = {}, current_selection = undefined;
+let talk_info = {}, global_data, current_selection = undefined;
 
 let server_list = [
   // 'http://127.0.0.1:9202',
@@ -9,17 +9,10 @@ let server_list = [
 let fetch_interval_id;
 
 function push_data() {
-  let data = [];
-  for (let i of meta_data) {
-    item = {};
-    for (let j in talk_list_header)
-      item[talk_list_header[j]] = i[j];
-    data.append(Object.assign(item, aux_data[item["id"]]));
-  }
   $.ajax({
     url: server_addr + '/push',
     type: 'POST',
-    data: JSON.stringify(data),
+    data: JSON.stringify(global_data),
     success: function (data) {
       console.log(data);
     },
@@ -33,10 +26,10 @@ function update_abs_and_bio() {
   let s = cherry.getValue();
   let arr = s.split('===');
   console.log(arr[0]);
-  aux_data[meta_data[current_selection][0]]["title"] = arr[0].substring(1).trim();
-  aux_data[meta_data[current_selection][0]]["abstract"] = arr[1].trim();
-  aux_data[meta_data[current_selection][0]]["bio"] = arr[2].trim();
-  console.log(meta_data[current_selection]);
+  global_data[current_selection]["title"] = arr[0].substring(1).trim();
+  global_data[current_selection]["abstract"] = arr[1].trim();
+  global_data[current_selection]["bio"] = arr[2].trim();
+  console.log(global_data[current_selection]);
   push_data();
 }
 
@@ -44,25 +37,12 @@ let mon_tab_changes = false;
 
 function load_data(data) {
   mon_tab_changes = false;
-  meta_data = new Array(data.length);
-  aux_data = {};
-  for (let i in data) {
-    meta_data[i] = new Array(talk_list_header.length);
-    for (let j of talk_list_header)
-      meta_data[i][j] = data[i][talk_list_header[j]];
-    aux_data[data[i]["id"]] = {
-      "title": data[i]["title"],
-      "abstract": data[i]["abstract"],
-      "bio": data[i]["bio"],
-      "pic": data[i]["pic"]
-    };
-  }
-  console.log(meta_data, aux_data);
-  for (let i in meta_data) {
+  global_data = JSON.parse(data);
+  for (let i in global_data) {
     for (let j in talk_list_header) {
       let x = parseInt(i) + 1, y = parseInt(j);
-      if (hot.getDataAtCell(x, y) !== meta_data[i][j]) {
-        hot.setDataAtCell(x, y, meta_data[i][j]);
+      if (hot.getDataAtCell(x, y) !== global_data[i][talk_list_header[j]]) {
+        hot.setDataAtCell(x, y, global_data[i][talk_list_header[j]]);
       }
     }
   }
@@ -98,10 +78,10 @@ const hot = new Handsontable(document.querySelector('#list'), {
     let i = row - 1;
     if (current_selection != i) {
       $('#profile-pic').attr("src", "");
-      if (meta_data && (i in meta_data)) {
+      if (global_data && (i in global_data)) {
         current_selection = i;
-        let s = `# ${meta_data[i]["title"]}\n\n===\n\n`;
-        s += meta_data[i]["abstract"] + '\n\n===\n\n' + meta_data[i]["bio"];
+        let s = `# ${global_data[i]["title"]}\n\n===\n\n`;
+        s += global_data[i]["abstract"] + '\n\n===\n\n' + global_data[i]["bio"];
         cherry.setValue(s);
 
         $('#profile-pic').attr("src", global_data[i]["pic-prev"]);
@@ -120,9 +100,9 @@ const hot = new Handsontable(document.querySelector('#list'), {
     if (mon_tab_changes) {
       changes?.forEach(([row, col, oldValue, newValue]) => {
         // Some logic...
-        meta_data[row - 1][talk_list_header[col]] = newValue;
+        global_data[row - 1][talk_list_header[col]] = newValue;
       });
-      console.log(meta_data);
+      console.log(global_data);
       push_data();
     }
   }
@@ -131,8 +111,8 @@ const hot = new Handsontable(document.querySelector('#list'), {
 function init() {
   function scroll_to_lastest() {
     let next = -1;
-    for (let i in meta_data) {
-      if (Date.parse(meta_data[i]["date"]) > Date.now()) {
+    for (let i in global_data) {
+      if (Date.parse(global_data[i]["date"]) > Date.now()) {
         next = parseInt(i) + 1;
         break;
       }
@@ -272,7 +252,7 @@ function start_generate(type) {
       type: 'POST',
       data: {
         type: type,
-        id: meta_data[current_selection]['id'],
+        id: global_data[current_selection]['id'],
         tit_fs: $('#tit-fs').val(),
         txt_fs: $('#txt-fs').val(),
         bio_mode: $('input[name="inlineRadioOptions"]:checked').val()
@@ -297,7 +277,7 @@ function get_stat(type) {
     $.ajax({
       url: server_addr + '/get-stat',
       type: 'POST',
-      data: { type: type, id: meta_data[current_selection]['id'] },
+      data: { type: type, id: global_data[current_selection]['id'] },
       success: function (data) {
         alert(`generation status:\n\n${data}`);
       },
@@ -313,7 +293,7 @@ function download(type) {
     $.ajax({
       url: server_addr + `/ready`,
       type: 'POST',
-      data: { id: meta_data[current_selection]['id'], type: type },
+      data: { id: global_data[current_selection]['id'], type: type },
       success: function (data) {
         if (data === "ready") {
           window.open(server_addr + `/download-${type}?id=${global_data[current_selection]['id']}`);
