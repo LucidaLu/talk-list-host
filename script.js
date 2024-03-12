@@ -3,7 +3,7 @@ let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affi
 let talk_info = {}, meta_data = [], aux_data = {}, current_selection = undefined;
 
 let server_list = [
-  //'http://127.0.0.1:9202', 
+  // 'http://127.0.0.1:9202',
   'http://10.206.32.47:9202', 'http://82.156.12.45:9202'], server_addr;
 
 let fetch_interval_id;
@@ -104,7 +104,7 @@ const hot = new Handsontable(document.querySelector('#list'), {
         s += meta_data[i]["abstract"] + '\n\n===\n\n' + meta_data[i]["bio"];
         cherry.setValue(s);
 
-        $('#profile-pic').attr("src", meta_data[i]["pic"]);
+        $('#profile-pic').attr("src", global_data[i]["pic-prev"]);
       } else {
         current_selection = undefined;
         cherry.setValue("");
@@ -244,9 +244,11 @@ $('#file').change(function () {
     url: server_addr + '/upload',
     type: 'POST',
     success: function (data) {
-      $('#profile-pic').attr("src", data);
+      data = JSON.parse(data);
+      $('#profile-pic').attr("src", data["prev_url"]);
       if (current_selection !== undefined) {
-        meta_data[current_selection]["pic"] = data;
+        global_data[current_selection]["pic"] = data["url"];
+        global_data[current_selection]["pic-prev"] = data["prev_url"];
         push_data();
       }
       $('#file').val('');
@@ -314,7 +316,7 @@ function download(type) {
       data: { id: meta_data[current_selection]['id'], type: type },
       success: function (data) {
         if (data === "ready") {
-          window.location.href = server_addr + `/download-${type}?id=${meta_data[current_selection]['id']}`;
+          window.open(server_addr + `/download-${type}?id=${global_data[current_selection]['id']}`);
         } else {
           alert('not ready yet');
         }
