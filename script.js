@@ -579,22 +579,40 @@ function send_mail(type) {
   //   },
   // });
   // console.log(s);
+  let yes = true;
+  if (type == 1) {
+    let i = 0;
+    while (i < 5) {
+      let s = "";
+      for (let j = 0; j < i; ++j) {
+        s += "真的";
+      }
 
-  $.ajax({
-    url: server_addr + '/send-mail',
-    type: 'POST',
-    data: {
-      type: type,
-      content: generate_mail(),
-      attachment: JSON.stringify([prd_data[active_prd[0] - 1]['attachment']])
-    },
-    success: function (data) {
-      console.log(data);
-    },
-    error: function (data) {
-      console.log(data);
-    },
-  });
+      yes = confirm(s + "确认群发邮件？");
+      if (yes) {
+        i += 1;
+      } else {
+        break;
+      }
+    }
+  }
+
+  if (yes)
+    $.ajax({
+      url: server_addr + '/send-mail',
+      type: 'POST',
+      data: {
+        type: type,
+        content: generate_mail(),
+        attachment: JSON.stringify([prd_data[active_prd[0] - 1]['attachment']])
+      },
+      success: function (data) {
+        console.log(data);
+      },
+      error: function (data) {
+        console.log(data);
+      },
+    });
 }
 
 
