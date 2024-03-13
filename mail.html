@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+
+<head>
+  <title>Mail Helper</title>
+  <style>
+    .display-area {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+      max-width: 80vw !important;
+      /* min-width: 80vw !important; */
+      height: 100vh;
+      /* text-align: center; */
+      color: rgb(119, 66, 141);
+      /* background-color: rgb(222, 222, 222); */
+    }
+
+    #info-sec {
+      height: 70vh;
+    }
+
+    #list-wrapper {
+      height: 47vh;
+    }
+
+
+    #image-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 80%;
+    }
+
+    #img-sec {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+
+    }
+
+    #profile-pic {
+      height: 20vh;
+    }
+
+    #md-wrap {
+      height: 100%;
+    }
+
+    ::-webkit-scrollbar {
+      width: 20px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #d6dee1;
+      border-radius: 20px;
+      border: 6px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #a8bbbf;
+    }
+
+
+    td {
+      text-align: left;
+      padding: 5px;
+    }
+
+    .btn,
+    .font-size {
+      width: 80px;
+    }
+
+    .font-size {
+      font-size: 12px !important;
+      padding: 5px !important;
+    }
+
+    #left-banner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 10vw;
+      height: 100vh;
+    }
+
+    #left-banner-text {
+      color: rgb(119, 66, 141);
+      /* transform: rotate(-90deg); */
+      font-size: 40px;
+    }
+
+
+    .sm-border {
+      border: 1px;
+      margin: 1px !important;
+      padding: 1px !important;
+    }
+  </style>
+  <link href="assets/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/cherry/cherry-markdown.min.css" rel="stylesheet" />
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" 
+    integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">-->
+</head>
+
+<body>
+  <div id="left-banner">
+    <div id="left-banner-text">
+      MAIL HELPER
+    </div>
+  </div>
+
+  <div class="display-area container">
+    <div id="list-wrapper" class="row">
+      <!--  -->
+      <div class="col-6">
+        <h2>Talks</h2>
+        <div id="list"></div>
+      </div>
+      <div class="col-6">
+        <h2>30 Min</h2>
+        <div id="reports"></div>
+      </div>
+    </div>
+
+    <div id="list-wrapper2" class="row">
+      <div class="col-6">
+        <h2>Paper reading</h2>
+        <!-- <button class="btn sm-border btn-sm btn-outline-secondary" onclick="upload_attach()">upload</button> -->
+        <form style="display: inline" enctype="multipart/form-data">
+          <input style="display: inline" name="file" type="file" id="attach-file" />
+        </form>
+        <button class="btn sm-border  btn-sm btn-outline-secondary" onclick="download_attach()">download</button>
+        <div id="prd"></div>
+      </div>
+      <div class="col-6">
+        <h2 style="display: inline;">Summary</h2>
+        <button class="btn sm-border  btn-sm btn-outline-secondary" onclick="preview_mail()">preview</button>
+        <button class="btn sm-border  btn-sm btn-outline-secondary" onclick="send_mail(0)">test</button>
+        <button class="btn sm-border  btn-sm btn-outline-secondary" onclick="send_mail(1)">release</button>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                Speaker
+              </td>
+              <td>
+                <span id="speaker-show"></span>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Report
+              </td>
+              <td>
+                <span id="report-show"></span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Reading
+              </td>
+              <td>
+                <span id="reading-show"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/citation-js" type="text/javascript"></script>
+  <!--   
+  
+  <script>
+    const Cite = require('citation-js');
+
+    let output = new Cite('10.48550/arXiv.2202.01037');
+
+    console.log(output)
+  </script> -->
+
+  <script src="assets/jquery-3.7.1.min.js"></script>
+  <script type="text/javascript" src="assets/handsontable.full.min.js"></script>
+  <link rel="stylesheet" href="assets/handsontable.full.min.css" />
+  <script src="assets/cherry/cherry-markdown.js"></script>
+  <script src="script.js"></script>
+</body>
+
+
+</html>

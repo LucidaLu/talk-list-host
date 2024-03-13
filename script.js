@@ -1,6 +1,6 @@
 let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation'];
 
-let talk_info = {}, global_data, current_selection = undefined;
+let talk_info = {}, all_data, global_data, reports_data, prd_data, current_selection = undefined;
 
 let server_list = [
   // 'http://127.0.0.1:9202',
@@ -8,11 +8,12 @@ let server_list = [
 
 let fetch_interval_id;
 
+let is_mail_page = document.getElementById('markdown-container') === null;
 function push_data() {
   $.ajax({
     url: server_addr + '/push',
     type: 'POST',
-    data: JSON.stringify(global_data),
+    data: JSON.stringify(all_data),
     success: function (data) {
       console.log(data);
     },
@@ -37,7 +38,8 @@ let mon_tab_changes = false;
 
 function load_data(data) {
   mon_tab_changes = false;
-  global_data = JSON.parse(data);
+  all_data = JSON.parse(data);
+  global_data = all_data["talks"];
   for (let i in global_data) {
     for (let j in talk_list_header) {
       let x = parseInt(i) + 1, y = parseInt(j);
@@ -46,6 +48,27 @@ function load_data(data) {
       }
     }
   }
+
+  reports_data = all_data["reports"];
+  for (let i in reports_data) {
+    for (let j in reports_header) {
+      let x = parseInt(i) + 1, y = parseInt(j);
+      if (hot_rep.getDataAtCell(x, y) !== reports_data[i][reports_header[j]]) {
+        hot_rep.setDataAtCell(x, y, reports_data[i][reports_header[j]]);
+      }
+    }
+  }
+
+  prd_data = all_data["pread"];
+  for (let i in prd_data) {
+    for (let j in prd_header) {
+      let x = parseInt(i) + 1, y = parseInt(j);
+      if (hot_prd.getDataAtCell(x, y) !== prd_data[i][prd_header[j]]) {
+        hot_prd.setDataAtCell(x, y, prd_data[i][prd_header[j]]);
+      }
+    }
+  }
+
   mon_tab_changes = true;
 }
 
@@ -66,15 +89,18 @@ function fetch_data(callback) {
   });
 }
 
+let active_speaker = [], active_report = [], active_prd = [];
+
 const hot = new Handsontable(document.querySelector('#list'), {
   data: [talk_list_header],
   minCols: talk_list_header.length,
   rowHeaders: true,
   width: $('#list-wrapper').width() / 2,
-  height: window.innerHeight * 0.3,
+  height: window.innerHeight * (is_mail_page ? 0.4 : 0.3),
   // colHeaders: true,
   licenseKey: 'non-commercial-and-evaluation',
   afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+    // console.log(hot.getSelected());
     let i = row - 1;
     if (current_selection != i) {
       $('#profile-pic').attr("src", "");
@@ -82,19 +108,38 @@ const hot = new Handsontable(document.querySelector('#list'), {
         current_selection = i;
         let s = `# ${global_data[i]["title"]}\n\n===\n\n`;
         s += global_data[i]["abstract"] + '\n\n===\n\n' + global_data[i]["bio"];
-        cherry.setValue(s);
+        if (cherry)
+          cherry.setValue(s);
 
         $('#profile-pic').attr("src", global_data[i]["pic-prev"]);
       } else {
         current_selection = undefined;
-        cherry.setValue("");
+        if (cherry)
+          cherry.setValue("");
       }
     }
+
+
 
     push_data();
 
     $('#img-sec').css("visibility", "visible");
     $('#info-sec').css("visibility", "visible");
+
+    if (is_mail_page) {
+      let s = "", rows = [];
+      for (i of hot.getSelected()) {
+        for (let j = Math.min(i[0], i[2]); j <= Math.max(i[0], i[2]); j++) rows.push(j);
+      }
+      rows.sort((a, b) => a - b);
+      for (let i of rows) {
+        if (s.length > 0) s += ", ";
+        s += global_data[i - 1]['presenter'] + `（${global_data[i - 1]['date']}）`;
+      }
+
+      active_speaker = rows;
+      $("#speaker-show").html(s);
+    }
   },
   afterChange: (changes) => {
     if (mon_tab_changes) {
@@ -107,6 +152,76 @@ const hot = new Handsontable(document.querySelector('#list'), {
     }
   }
 });
+
+let hot_rep = undefined, hot_prd = undefined;
+let reports_header = ['date', 'time', 'room', 'student'], prd_header = ['date', 'time', 'room', 'student', 'doi', 'attachment'];
+if (is_mail_page) {
+  hot_rep = new Handsontable(document.querySelector('#reports'), {
+    data: [reports_header],
+    minCols: 5,
+    rowHeaders: true,
+    width: $('#list-wrapper').width() / 2,
+    height: window.innerHeight * 0.4,
+    // colHeaders: true,
+    licenseKey: 'non-commercial-and-evaluation',
+    afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+      let s = "", rows = [];
+      for (i of hot_rep.getSelected()) {
+        for (let j = Math.min(i[0], i[2]); j <= Math.max(i[0], i[2]); j++) rows.push(j);
+      }
+      rows.sort((a, b) => a - b);
+      for (let i of rows) {
+        if (s.length > 0) s += ", ";
+        s += reports_data[i - 1]['student'] + `（${reports_data[i - 1]['date']}）`;
+      }
+      active_report = rows;
+      $("#report-show").html(s);
+    },
+    afterChange: (changes) => {
+      if (mon_tab_changes) {
+        changes?.forEach(([row, col, oldValue, newValue]) => {
+          // Some logic...
+          reports_data[row - 1][reports_header[col]] = newValue;
+        });
+        console.log(reports_data);
+        push_data();
+      }
+    }
+  });
+
+  hot_prd = new Handsontable(document.querySelector('#prd'), {
+    data: [prd_header],
+    minCols: 5,
+    rowHeaders: true,
+    width: $('#list-wrapper').width() / 2,
+    height: window.innerHeight * 0.45,
+    // colHeaders: true,
+    licenseKey: 'non-commercial-and-evaluation',
+    afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+      let s = "", rows = [];
+      for (i of hot_prd.getSelected()) {
+        for (let j = Math.min(i[0], i[2]); j <= Math.max(i[0], i[2]); j++) rows.push(j);
+      }
+      rows.sort((a, b) => a - b);
+      for (let i of rows) {
+        if (s.length > 0) s += ", ";
+        s += prd_data[i - 1]['student'] + `（${prd_data[i - 1]['date']}）`;
+      }
+      active_prd = rows;
+      $("#reading-show").html(s);
+    },
+    afterChange: (changes) => {
+      if (mon_tab_changes) {
+        changes?.forEach(([row, col, oldValue, newValue]) => {
+          // Some logic...
+          prd_data[row - 1][prd_header[col]] = newValue;
+        });
+        console.log(prd_data);
+        push_data();
+      }
+    }
+  });
+}
 
 function init() {
   function scroll_to_lastest() {
@@ -144,73 +259,78 @@ function init() {
 }
 
 init();
-
-let cherry = new Cherry({
-  id: 'markdown-container',
-  externals: {
-    katex: window.katex,
-    MathJax: window.MathJax,
-  },
-  isPreviewOnly: false,
-  engine: {
-    global: {
-      urlProcessor(url, srcType) {
-        console.log(`url-processor`, url, srcType);
-        return url;
+let cherry = undefined;
+// check if there is #markdown-container
+if (is_mail_page) {
+  console.error('No #markdown-container found');
+} else {
+  cherry = new Cherry({
+    id: 'markdown-container',
+    externals: {
+      katex: window.katex,
+      MathJax: window.MathJax,
+    },
+    isPreviewOnly: false,
+    engine: {
+      global: {
+        urlProcessor(url, srcType) {
+          console.log(`url-processor`, url, srcType);
+          return url;
+        },
+      },
+      syntax: {
+        codeBlock: {
+          theme: 'twilight',
+        },
+        table: {
+          enableChart: false,
+          // chartEngine: Engine Class
+        },
+        fontEmphasis: {
+          allowWhitespace: false, // 是否允许首尾空格
+        },
+        strikethrough: {
+          needWhitespace: false, // 是否必须有前后空格
+        },
+        mathBlock: {
+          engine: 'MathJax', // katex或MathJax
+          src: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js', // 如果使用MathJax plugins，则需要使用该url通过script标签引入
+        },
+        inlineMath: {
+          engine: 'MathJax', // katex或MathJax
+        },
+        emoji: {
+          useUnicode: false,
+          customResourceURL: 'https://github.githubassets.com/images/icons/emoji/unicode/${code}.png?v8',
+          upperCase: true,
+        },
       },
     },
-    syntax: {
-      codeBlock: {
-        theme: 'twilight',
-      },
-      table: {
-        enableChart: false,
-        // chartEngine: Engine Class
-      },
-      fontEmphasis: {
-        allowWhitespace: false, // 是否允许首尾空格
-      },
-      strikethrough: {
-        needWhitespace: false, // 是否必须有前后空格
-      },
-      mathBlock: {
-        engine: 'MathJax', // katex或MathJax
-        src: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js', // 如果使用MathJax plugins，则需要使用该url通过script标签引入
-      },
-      inlineMath: {
-        engine: 'MathJax', // katex或MathJax
-      },
-      emoji: {
-        useUnicode: false,
-        customResourceURL: 'https://github.githubassets.com/images/icons/emoji/unicode/${code}.png?v8',
-        upperCase: true,
-      },
+    toolbars: {
+      showToolbar: false,
+      toolbar: false,
+      bubble: false,
+      float: false,
     },
-  },
-  toolbars: {
-    showToolbar: false,
-    toolbar: false,
-    bubble: false,
-    float: false,
-  },
-  editor: {
-    defaultModel: 'edit&preview',
-  },
-  previewer: {
-    // 自定义markdown预览区域class
-    // className: 'markdown'
-  },
-  keydown: [],
-  //extensions: [],
-  editor: {
-    id: 'cherry-text',
-    name: 'cherry-text',
-    autoSave2Textarea: true,
-  },
-  callback: {
-    afterChange: update_abs_and_bio,
-  }
-});
+    editor: {
+      defaultModel: 'edit&preview',
+    },
+    previewer: {
+      // 自定义markdown预览区域class
+      // className: 'markdown'
+    },
+    keydown: [],
+    //extensions: [],
+    editor: {
+      id: 'cherry-text',
+      name: 'cherry-text',
+      autoSave2Textarea: true,
+    },
+    callback: {
+      afterChange: update_abs_and_bio,
+    }
+  });
+}
 
 $('#file').change(function () {
   var f = this.files[0];
@@ -307,3 +427,166 @@ function download(type) {
     });
   }
 }
+
+const Cite = require('citation-js');
+
+function month_day(date_string) {
+  let dao = new Date(date_string);
+  return `${dao.getMonth() + 1}月${dao.getDate()}日`;
+}
+
+function generate_mail() {
+  console.log(active_speaker, active_report, active_prd);
+  let s = "";
+  function fmt_date(ds) {
+    let date_obj = new Date(ds);
+    // 3月4日（本周四） 10:00-11:00
+    return `${date_obj.getMonth() + 1}月${date_obj.getDate()}日（${['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date_obj.getDay()]}） ${date_obj.getHours().toString().padStart(2, '0')}:${date_obj.getMinutes().toString().padStart(2, '0')}~${(date_obj.getHours() + 1).toString().padStart(2, '0')}:${date_obj.getMinutes().toString().padStart(2, '0')}`;
+  }
+
+  function remove_outdiv(s) {
+    const newDiv = document.createElement("div");
+    newDiv.innerHTML = s;
+    s = newDiv.children[0].children[0].innerHTML;
+    newDiv.remove();
+    return s;
+  }
+
+  let note = '';
+  for (let i of active_prd) {
+    let data = prd_data[i - 1];
+    let cite_obj = new Cite(data['doi']);
+
+    note = `<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt">* ${remove_outdiv(cite_obj.format('bibliography', {
+      format: 'html',
+      template: 'apa',
+      lang: 'en-US'
+    }))}</p>`;
+
+    s += `<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>内　容：paper reading</strong>（${data['student']}）</p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>论　文：</strong>${cite_obj.get()[0]['title']}*（见附件）</p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>地　点：</strong>会议室${data['room']} + 腾讯会议612-2691-6328</p>
+
+<p>&nbsp;</p>
+`
+  }
+  for (let i of active_speaker) {
+    let data = global_data[i - 1];
+
+    s += `<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>内　容：QuACT讲座</strong></p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>题　目：</strong>${data['title']}</p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>讲　者：</strong>${data['presenter']}</p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>地　点：</strong>会议室${data['room']} + 腾讯会议605-5793-9921</p>
+
+<p>&nbsp;</p>
+`;
+  }
+
+  for (let i of active_report) {
+    let data = reports_data[i - 1];
+    s += `<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>内　容：组会</strong>（${data['student']}半小时报告 + 每人5分钟报告）</p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
+<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>地　点：</strong>会议室${data['room']} + 腾讯会议722-5788-8455</p>
+
+<p>&nbsp;</p>
+`;
+  }
+
+
+  let nxt_report = active_report[0] + 1;
+  let nxt_prd = active_prd[0] + 1;
+
+  let table = '';
+  for (let i = 0; i < 5; ++i) {
+    table += `<tr style="text-align:center;font-family: Arial; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><td style="text-align:left;">${month_day(prd_data[nxt_prd - 1 + i]['date'])}</td><td>${prd_data[nxt_prd - 1 + i]['student']}</td><td>${reports_data[nxt_report - 1 + i]['student']}</td></tr>`;
+  }
+
+  s += `<table><tbody><tr style="text-align:center;font-family: Arial; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><td style="text-align:left;">时间</td><td>半小时报告</td><td>paper reading</td></tr>${table}</tbody></table>`;
+  s += `<p>&nbsp;</p>`;
+  s += note;
+  return s;
+}
+
+function preview_mail() {
+  console.log(generate_mail());
+}
+
+
+function send_mail(type) {
+  // let API_USER = 'sc_fffcia_test_6vlaNc';
+  // let API_KEY = '55630b50b3e6b0ac0e2ed95e522543ad';
+  // $.ajax({
+  //   url: "http://api.sendcloud.net/apiv2/mail/send",
+  //   type: 'POST',
+  //   success: (e) => {
+  //     console.log(e);
+  //   },
+  //   data: {
+  //     "apiUser": API_USER,
+  //     "apiKey": API_KEY,
+  //     "to": "luyiren12@gmail.com",
+  //     "from": "sendcloud@sendcloud.org",
+  //     "fromName": "SendCloud",
+  //     "subject": "【paper reading+QuACT+组会+周报】本周安排",
+  //     "html": generate_mail(),
+  //   },
+  // });
+  // console.log(s);
+
+  $.ajax({
+    url: server_addr + '/send-mail',
+    type: 'POST',
+    data: {
+      content: generate_mail(),
+      attachment: JSON.stringify([prd_data[active_prd[0] - 1]['attachment']])
+    },
+    success: function (data) {
+      console.log(data);
+    },
+    error: function (data) {
+      console.log(data);
+    },
+  });
+}
+
+
+
+
+function download_attach() {
+  let active = active_prd[0];
+  if (active !== undefined) {
+    window.open(server_addr + `/ download - attach ? name = ${prd_data[active - 1]['attachment']} `);
+  }
+}
+
+$('#attach-file').change(function () {
+  var f = this.files[0];
+  var formData = new FormData();
+  let cite_obj = new Cite(prd_data[active_prd[0] - 1]['doi']);
+  let datestr = prd_data[active_prd[0] - 1]['date'].slice(5);
+  let newf = new File([f], `【${datestr} ${prd_data[active_prd[0] - 1]['student']}】${cite_obj.get()[0].title}.pdf`, { type: f.type });
+  formData.append('file', newf);
+  console.log(formData);
+  document.getElementById("attach-file").disabled = true;
+
+  $.ajax({
+    url: server_addr + '/upload-attach',
+    type: 'POST',
+    success: function (data) {
+      console.log(data);
+      let act = active_prd[0];
+      hot_prd.setDataAtCell(act, 5, newf.name);
+      push_data();
+      document.getElementById("attach-file").disabled = false;
+    },
+    error: function (data) {
+      console.log(data);
+    },
+    data: formData,
+    cache: false,
+    contentType: false,
+    processData: false
+  });
+});
