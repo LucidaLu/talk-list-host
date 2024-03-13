@@ -165,7 +165,7 @@ if (is_mail_page) {
     data: [reports_header],
     minCols: 5,
     rowHeaders: true,
-    
+
     width: $('#list-wrapper').width() / 2,
     height: window.innerHeight * 0.4,
     // colHeaders: true,
@@ -553,7 +553,9 @@ function generate_mail() {
 }
 
 function preview_mail() {
-  console.log(generate_mail());
+  let s = generate_mail();
+  var win = window.open("", "预览", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600,top=100, left=100");// + (screen.height - 400) + ",left=" + (screen.width - 840));
+  win.document.body.innerHTML = s;
 }
 
 
