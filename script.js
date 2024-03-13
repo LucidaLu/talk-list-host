@@ -579,7 +579,7 @@ function send_mail(type) {
 function download_attach() {
   let active = active_prd[0];
   if (active !== undefined) {
-    window.open(server_addr + `/ download - attach ? name = ${prd_data[active - 1]['attachment']} `);
+    window.open(server_addr + `/download-attach?name=${prd_data[active - 1]['attachment']}`);
   }
 }
 
