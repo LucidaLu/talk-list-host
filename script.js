@@ -438,10 +438,10 @@ function month_day(date_string) {
 function generate_mail() {
   console.log(active_speaker, active_report, active_prd);
   let s = "";
-  function fmt_date(ds) {
+  function fmt_date(ds, len = 1) {
     let date_obj = new Date(ds);
     // 3月4日（本周四） 10:00-11:00
-    return `${date_obj.getMonth() + 1}月${date_obj.getDate()}日（${['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date_obj.getDay()]}） ${date_obj.getHours().toString().padStart(2, '0')}:${date_obj.getMinutes().toString().padStart(2, '0')}~${(date_obj.getHours() + 1).toString().padStart(2, '0')}:${date_obj.getMinutes().toString().padStart(2, '0')}`;
+    return `${date_obj.getMonth() + 1}月${date_obj.getDate()}日（${['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date_obj.getDay()]}） ${date_obj.getHours().toString().padStart(2, '0')}:${date_obj.getMinutes().toString().padStart(2, '0')}~${(date_obj.getHours() + len).toString().padStart(2, '0')}:${date_obj.getMinutes().toString().padStart(2, '0')}`;
   }
 
   function remove_outdiv(s) {
@@ -452,21 +452,29 @@ function generate_mail() {
     return s;
   }
 
-  let note = '';
+  const P_STYLE = `style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.5; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"`;
+
+
+  s += `<p ${P_STYLE}>大家好！</p>
+<p ${P_STYLE}>下面是本周活动安排：</p>
+<p>&nbsp;</p>`;
+  let notes = [];
   for (let i of active_prd) {
     let data = prd_data[i - 1];
     let cite_obj = new Cite(data['doi']);
 
-    note = `<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt">* ${remove_outdiv(cite_obj.format('bibliography', {
+    let sym = ''.padStart(notes.length + 1, '*');
+    let no = notes.length + 1;
+    notes.push(`<p ${P_STYLE} id="footnote-${no}"><sup>${sym}</sup> ${remove_outdiv(cite_obj.format('bibliography', {
       format: 'html',
       template: 'apa',
       lang: 'en-US'
-    }))}</p>`;
+    }))}</p>`);
 
-    s += `<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>内　容：paper reading</strong>（${data['student']}）</p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>论　文：</strong>${cite_obj.get()[0]['title']}*（见附件）</p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>地　点：</strong>会议室${data['room']} + 腾讯会议612-2691-6328</p>
+    s += `<p ${P_STYLE}><strong>内　容：paper reading</strong>（${data['student']}）</p>
+<p ${P_STYLE}><strong>论　文：</strong>${cite_obj.get()[0]['title']}<sup>${sym}</sup>（见附件）</p>
+<p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
+<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议612-2691-6328</p>
 
 <p>&nbsp;</p>
 `
@@ -474,11 +482,11 @@ function generate_mail() {
   for (let i of active_speaker) {
     let data = global_data[i - 1];
 
-    s += `<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>内　容：QuACT讲座</strong></p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>题　目：</strong>${data['title']}</p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>讲　者：</strong>${data['presenter']}</p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>地　点：</strong>会议室${data['room']} + 腾讯会议605-5793-9921</p>
+    s += `<p ${P_STYLE}><strong>内　容：QuACT讲座</strong></p>
+<p ${P_STYLE}><strong>题　目：</strong>${data['title']}</p>
+<p ${P_STYLE}><strong>讲　者：</strong>${data['presenter']}</p>
+<p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
+<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议605-5793-9921</p>
 
 <p>&nbsp;</p>
 `;
@@ -486,9 +494,9 @@ function generate_mail() {
 
   for (let i of active_report) {
     let data = reports_data[i - 1];
-    s += `<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>内　容：组会</strong>（${data['student']}半小时报告 + 每人5分钟报告）</p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
-<p style="font-family: Arial; text-align: left; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><strong>地　点：</strong>会议室${data['room']} + 腾讯会议722-5788-8455</p>
+    s += `<p ${P_STYLE}><strong>内　容：组会</strong>（${data['student']}半小时报告 + 每人5分钟报告）</p>
+<p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`, 2)}</p>
+<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议722-5788-8455</p>
 
 <p>&nbsp;</p>
 `;
@@ -498,14 +506,27 @@ function generate_mail() {
   let nxt_report = active_report[0] + 1;
   let nxt_prd = active_prd[0] + 1;
 
+
+  const TD_STYLE = `style="padding: .5em 1em;border-left: 1px solid #cbcbcb;border-width: 0 0 1px 0;font-size: inherit;margin: 0;overflow: visible;background-color: transparent;border-bottom: 1px solid #cbcbcb; font-family:Arial; font-size: 12pt; text-align:center"`;
+  const TH_STYLE = `style="padding: .5em 1em;border-left: 1px solid #cbcbcb;border-width: 0 0 1px 0;font-size: inherit;margin: 0;overflow: visible;border-bottom: 1px solid #cbcbcb; font-family:Arial; font-size: 12pt; text-align:center"`;
+
   let table = '';
   for (let i = 0; i < 5; ++i) {
-    table += `<tr style="text-align:center;font-family: Arial; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><td style="text-align:left;">${month_day(prd_data[nxt_prd - 1 + i]['date'])}</td><td>${prd_data[nxt_prd - 1 + i]['student']}</td><td>${reports_data[nxt_report - 1 + i]['student']}</td></tr>`;
+    table += `<tr><td ${TD_STYLE}>${month_day(prd_data[nxt_prd - 1 + i]['date'])}</td><td ${TD_STYLE}>${reports_data[nxt_report - 1 + i]['student']}</td><td ${TD_STYLE}>${prd_data[nxt_prd - 1 + i]['student']}</td></tr>`;
   }
 
-  s += `<table><tbody><tr style="text-align:center;font-family: Arial; text-indent: 0px; line-height: 1.38; margin-top: 0px; margin-bottom: 0px; font-size: 12pt"><td style="text-align:left;">时间</td><td>半小时报告</td><td>paper reading</td></tr>${table}</tbody></table>`;
+  s += `<p ${P_STYLE}><strong style="line-height: 2">接下来几周组会及paper reading安排暂定如下：</strong></p>`;
+  s += `<table style="border-collapse: collapse;border-spacing: 0;empty-cells: show;border: 1px solid #cbcbcb;"><thead style="background-color: #e0e0e0;color: #000;text-align: left;vertical-align: bottom;"><tr><th ${TH_STYLE}>时间</th><th ${TH_STYLE}>半小时报告</th><th ${TH_STYLE}>paper reading</td></tr></thead><tbody>${table}</tbody></table>`;
   s += `<p>&nbsp;</p>`;
-  s += note;
+
+  s += `<p ${P_STYLE}>另外，<span style="color:red">请大家及时将周报提交给对应老师，并在本周周报进行更新。</span></p>`;
+
+  s += `<p>&nbsp;</p>`;
+
+  s += "<hr/>"
+
+  s += notes.join('\n');
+
   return s;
 }
 
@@ -539,6 +560,7 @@ function send_mail(type) {
     url: server_addr + '/send-mail',
     type: 'POST',
     data: {
+      type: type,
       content: generate_mail(),
       attachment: JSON.stringify([prd_data[active_prd[0] - 1]['attachment']])
     },
