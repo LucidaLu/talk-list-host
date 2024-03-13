@@ -1,4 +1,4 @@
-let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation'];
+let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation', 'wechat-link'];
 
 let talk_info = {}, all_data, global_data, reports_data, prd_data, current_selection = undefined;
 
@@ -95,6 +95,7 @@ const hot = new Handsontable(document.querySelector('#list'), {
   data: [talk_list_header],
   minCols: talk_list_header.length,
   rowHeaders: true,
+  colWidths: [50, 50, 100, 50, 50, 100, 200, 100],
   width: $('#list-wrapper').width() / 2,
   height: window.innerHeight * (is_mail_page ? 0.4 : 0.3),
   // colHeaders: true,
@@ -150,7 +151,11 @@ const hot = new Handsontable(document.querySelector('#list'), {
       console.log(global_data);
       push_data();
     }
-  }
+  },
+  // renderer: function (instance, td, row, col, prop, value, cellProperties) {
+  //   Handsontable.renderers.TextRenderer.apply(this, arguments);
+  //   td.innerHTML = `<div class="truncated">${value}</div>`
+  // }
 });
 
 let hot_rep = undefined, hot_prd = undefined;
@@ -160,6 +165,7 @@ if (is_mail_page) {
     data: [reports_header],
     minCols: 5,
     rowHeaders: true,
+    
     width: $('#list-wrapper').width() / 2,
     height: window.innerHeight * 0.4,
     // colHeaders: true,
@@ -186,7 +192,11 @@ if (is_mail_page) {
         console.log(reports_data);
         push_data();
       }
-    }
+    },
+    // renderer: function (instance, td, row, col, prop, value, cellProperties) {
+    //   Handsontable.renderers.TextRenderer.apply(this, arguments);
+    //   td.innerHTML = `<div class="truncated">${value}</div>`
+    // }
   });
 
   hot_prd = new Handsontable(document.querySelector('#prd'), {
@@ -194,6 +204,7 @@ if (is_mail_page) {
     minCols: 5,
     rowHeaders: true,
     width: $('#list-wrapper').width() / 2,
+    colWidths: [100, 50, 50, 100, 200, 200],
     height: window.innerHeight * 0.45,
     // colHeaders: true,
     licenseKey: 'non-commercial-and-evaluation',
@@ -219,7 +230,11 @@ if (is_mail_page) {
         console.log(prd_data);
         push_data();
       }
-    }
+    },
+    // renderer: function (instance, td, row, col, prop, value, cellProperties) {
+    //   Handsontable.renderers.TextRenderer.apply(this, arguments);
+    //   td.innerHTML = `<div class="truncated">${value}</div>`
+    // }
   });
 }
 
@@ -474,7 +489,7 @@ function generate_mail() {
     s += `<p ${P_STYLE}><strong>内　容：paper reading</strong>（${data['student']}）</p>
 <p ${P_STYLE}><strong>论　文：</strong>${cite_obj.get()[0]['title']}<sup>${sym}</sup>（见附件）</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
-<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议612-2691-6328</p>
+<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/vgWvFfibhmRA">612-2691-6328</a></p>
 
 <p>&nbsp;</p>
 `
@@ -483,10 +498,10 @@ function generate_mail() {
     let data = global_data[i - 1];
 
     s += `<p ${P_STYLE}><strong>内　容：QuACT讲座</strong></p>
-<p ${P_STYLE}><strong>题　目：</strong>${data['title']}</p>
-<p ${P_STYLE}><strong>讲　者：</strong>${data['presenter']}</p>
+<p ${P_STYLE}><strong>题　目：</strong><a href="${data['wechat-link']}">${data['title']}</a></p>
+<p ${P_STYLE}><strong>讲　者：</strong>${data['presenter']}，${data['affiliation']}</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
-<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议605-5793-9921</p>
+<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/n6CjOLd30Mjl">605-5793-9921</a></p>
 
 <p>&nbsp;</p>
 `;
@@ -496,7 +511,7 @@ function generate_mail() {
     let data = reports_data[i - 1];
     s += `<p ${P_STYLE}><strong>内　容：组会</strong>（${data['student']}半小时报告 + 每人5分钟报告）</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`, 2)}</p>
-<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议722-5788-8455</p>
+<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/NHZnA7sCte1P">722-5788-8455</a></p>
 
 <p>&nbsp;</p>
 `;
@@ -525,7 +540,14 @@ function generate_mail() {
 
   s += "<hr/>"
 
-  s += notes.join('\n');
+  var re = /((?:href|src)=")?(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
+  s += notes.join('\n').replace(re, function (match, attr) {
+    if (typeof attr != 'undefined') {
+      return match;
+    }
+    return '<a target="_blank" href="' + match + '">' + match + '</a>';
+  });
 
   return s;
 }
