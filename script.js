@@ -552,7 +552,7 @@ function generate_mail() {
   return s;
 }
 
-function preview_mail() {
+async function preview_mail() {
   let s = generate_mail();
   var win = window.open("", "预览", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600,top=100, left=100");// + (screen.height - 400) + ",left=" + (screen.width - 840));
   win.document.body.innerHTML = s;
