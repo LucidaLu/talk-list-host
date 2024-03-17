@@ -16,6 +16,7 @@ function push_data() {
     data: JSON.stringify(all_data),
     success: function (data) {
       console.log(data);
+      fetch_data();
     },
     error: function (data) {
       console.log(data);
@@ -262,13 +263,13 @@ function init() {
       console.log('in ICT');
       load_data(data);
       scroll_to_lastest();
-      fetch_interval_id = setInterval(fetch_data, 5000);
+      // fetch_interval_id = setInterval(fetch_data, 5000);
     },
     error: (data) => {
       console.log('out of ICT');
       server_addr = server_list[1];
       fetch_data(scroll_to_lastest);
-      fetch_interval_id = setInterval(fetch_data, 5000);
+      // fetch_interval_id = setInterval(fetch_data, 5000);
     },
     timeout: 1000,
     data: {},
