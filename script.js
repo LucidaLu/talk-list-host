@@ -49,22 +49,24 @@ function load_data(data) {
     }
   }
 
-  reports_data = all_data["reports"];
-  for (let i in reports_data) {
-    for (let j in reports_header) {
-      let x = parseInt(i) + 1, y = parseInt(j);
-      if (hot_rep.getDataAtCell(x, y) !== reports_data[i][reports_header[j]]) {
-        hot_rep.setDataAtCell(x, y, reports_data[i][reports_header[j]]);
+  if (is_mail_page) {
+    reports_data = all_data["reports"];
+    for (let i in reports_data) {
+      for (let j in reports_header) {
+        let x = parseInt(i) + 1, y = parseInt(j);
+        if (hot_rep.getDataAtCell(x, y) !== reports_data[i][reports_header[j]]) {
+          hot_rep.setDataAtCell(x, y, reports_data[i][reports_header[j]]);
+        }
       }
     }
-  }
 
-  prd_data = all_data["pread"];
-  for (let i in prd_data) {
-    for (let j in prd_header) {
-      let x = parseInt(i) + 1, y = parseInt(j);
-      if (hot_prd.getDataAtCell(x, y) !== prd_data[i][prd_header[j]]) {
-        hot_prd.setDataAtCell(x, y, prd_data[i][prd_header[j]]);
+    prd_data = all_data["pread"];
+    for (let i in prd_data) {
+      for (let j in prd_header) {
+        let x = parseInt(i) + 1, y = parseInt(j);
+        if (hot_prd.getDataAtCell(x, y) !== prd_data[i][prd_header[j]]) {
+          hot_prd.setDataAtCell(x, y, prd_data[i][prd_header[j]]);
+        }
       }
     }
   }
