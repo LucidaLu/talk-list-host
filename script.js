@@ -16,6 +16,7 @@ function push_data() {
     data: JSON.stringify(all_data),
     success: function (data) {
       console.log(data);
+      fetch_data();
     },
     error: function (data) {
       console.log(data);
@@ -49,22 +50,24 @@ function load_data(data) {
     }
   }
 
-  reports_data = all_data["reports"];
-  for (let i in reports_data) {
-    for (let j in reports_header) {
-      let x = parseInt(i) + 1, y = parseInt(j);
-      if (hot_rep.getDataAtCell(x, y) !== reports_data[i][reports_header[j]]) {
-        hot_rep.setDataAtCell(x, y, reports_data[i][reports_header[j]]);
+  if (is_mail_page) {
+    reports_data = all_data["reports"];
+    for (let i in reports_data) {
+      for (let j in reports_header) {
+        let x = parseInt(i) + 1, y = parseInt(j);
+        if (hot_rep.getDataAtCell(x, y) !== reports_data[i][reports_header[j]]) {
+          hot_rep.setDataAtCell(x, y, reports_data[i][reports_header[j]]);
+        }
       }
     }
-  }
 
-  prd_data = all_data["pread"];
-  for (let i in prd_data) {
-    for (let j in prd_header) {
-      let x = parseInt(i) + 1, y = parseInt(j);
-      if (hot_prd.getDataAtCell(x, y) !== prd_data[i][prd_header[j]]) {
-        hot_prd.setDataAtCell(x, y, prd_data[i][prd_header[j]]);
+    prd_data = all_data["pread"];
+    for (let i in prd_data) {
+      for (let j in prd_header) {
+        let x = parseInt(i) + 1, y = parseInt(j);
+        if (hot_prd.getDataAtCell(x, y) !== prd_data[i][prd_header[j]]) {
+          hot_prd.setDataAtCell(x, y, prd_data[i][prd_header[j]]);
+        }
       }
     }
   }
@@ -260,13 +263,13 @@ function init() {
       console.log('in ICT');
       load_data(data);
       scroll_to_lastest();
-      fetch_interval_id = setInterval(fetch_data, 5000);
+      // fetch_interval_id = setInterval(fetch_data, 5000);
     },
     error: (data) => {
       console.log('out of ICT');
       server_addr = server_list[1];
       fetch_data(scroll_to_lastest);
-      fetch_interval_id = setInterval(fetch_data, 5000);
+      // fetch_interval_id = setInterval(fetch_data, 5000);
     },
     timeout: 1000,
     data: {},
@@ -552,7 +555,7 @@ function generate_mail() {
   return s;
 }
 
-function preview_mail() {
+async function preview_mail() {
   let s = generate_mail();
   var win = window.open("", "预览", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600,top=100, left=100");// + (screen.height - 400) + ",left=" + (screen.width - 840));
   win.document.body.innerHTML = s;
