@@ -657,3 +657,79 @@ $('#attach-file').change(function () {
     processData: false
   });
 });
+
+const mail_list_header = ["mail", "alias"];
+const rec_mail = new Handsontable(document.querySelector('#rec-mails'), {
+  data: [mail_list_header],
+  minCols: mail_list_header.length,
+  rowHeaders: true,
+  colWidths: [300, 100],
+  width: $('#rec-mails-wrapper').width(),
+  height: window.innerHeight * 0.5,
+  // colHeaders: true,
+  licenseKey: 'non-commercial-and-evaluation',
+});
+
+const cc_mail = new Handsontable(document.querySelector('#cc-mails'), {
+  data: [mail_list_header],
+  minCols: mail_list_header.length,
+  rowHeaders: true,
+  colWidths: [300, 100],
+  width: $('#cc-mails-wrapper').width(),
+  height: window.innerHeight * 0.5,
+  licenseKey: 'non-commercial-and-evaluation',
+});
+
+$('#mailingModal').on('show.bs.modal', function (event) {
+  $.ajax({
+    url: server_addr + '/get-mail',
+    type: 'POST',
+    success: function (data) {
+      let mail_data = JSON.parse(data);
+      console.log(mail_data);
+
+      for (let i in mail_data['rec']) {
+        for (let j in mail_data['rec'][i]) {
+          rec_mail.setDataAtCell(parseInt(i) + 1, parseInt(j), mail_data['rec'][i][j]);
+        }
+      }
+
+      for (let i in mail_data['cc']) {
+        for (let j in mail_data['cc'][i]) {
+          cc_mail.setDataAtCell(parseInt(i) + 1, parseInt(j), mail_data['cc'][i][j]);
+        }
+      }
+    },
+    error: function (data) {
+      console.log(data);
+    },
+  });
+
+})
+
+function save_mailst() {
+  console.log(321);
+  let mail_data = {
+    rec: [],
+    cc: [],
+  };
+  for (let i = 1; i < rec_mail.countRows(); ++i) {
+    mail_data['rec'].push([rec_mail.getDataAtCell(i, 0), rec_mail.getDataAtCell(i, 1)]);
+  }
+  for (let i = 1; i < cc_mail.countRows(); ++i) {
+    mail_data['cc'].push([cc_mail.getDataAtCell(i, 0), cc_mail.getDataAtCell(i, 1)]);
+  }
+  console.log(mail_data);
+
+  $.ajax({
+    url: server_addr + '/push-mail',
+    type: 'POST',
+    data: { mailst: JSON.stringify(mail_data) },
+    success: function (data) {
+      console.log(data);
+    },
+    error: function (data) {
+      console.log(data);
+    }
+  });
+}

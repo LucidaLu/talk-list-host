@@ -116,6 +116,8 @@
   </style>
   <link href="/assets/bootstrap.min.css" rel="stylesheet">
   <link href="/assets/cherry/cherry-markdown.min.css" rel="stylesheet" />
+
+
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" 
     integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">-->
 </head>
@@ -126,10 +128,38 @@
       MAIL HELPER
     </div>
     <div style="width: 100%; padding-left: 20px;">
-      <button class="btn sm-border btn-sm btn-outline-secondary" onclick="fetch_data()">refresh
-        ⟳</button>
+      <button class="btn sm-border btn-sm btn-outline-secondary" onclick="fetch_data()">refresh</button><br>
+      <button class="btn sm-border btn-sm btn-outline-secondary" data-toggle="modal"
+        data-target="#mailingModal">list</button>
     </div>
 
+    <div class="modal fade" id="mailingModal" tabindex="-1" role="dialog" aria-labelledby="mailingModalTitle"
+      aria-hidden="true">
+      <div class="modal-dialog  modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="mailingModalTitle">Editing Mailing List</h5>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-6" id="rec-mails-wrapper">
+                  <h5>Recipients</h5>
+                  <div id="rec-mails"></div>
+                </div>
+                <div class="col-6" id="cc-mails-wrapper">
+                  <h5>CCs</h5>
+                  <div id="cc-mails"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="save_mailst()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="display-area container">
@@ -210,6 +240,8 @@
   <link rel="stylesheet" href="/assets/handsontable.full.min.css" />
   <script src="/assets/cherry/cherry-markdown.js"></script>
   <script src="/script.js"></script>
+  <script src="/assets/popper.min.js"></script>
+  <script src="/assets/bootstrap.min.js"></script>
 </body>
 
 
