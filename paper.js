@@ -46,19 +46,27 @@ let resultItem = {
   tabSelect: true,
 };
 
-function ac_src(elem_id, placeholder, src) {
-  return async () => {
-    try {
-      document.getElementById(elem_id).setAttribute("placeholder", "Loading...");
-      const source = await fetch('http://127.0.0.1:9202/indexfiles/' + src);
-      const data = await source.json();
-      document.getElementById(elem_id).setAttribute("placeholder", placeholder);
-      return data;
-    } catch (error) {
-      return error;
-    }
-  };
-}
+$.get({
+  async: false,
+  url: 'http://127.0.0.1:9202/files/index.json',
+  success: function (data) {
+    indexfiles = data;
+  }
+});
+
+// function ac_src(elem_id, placeholder, src) {
+//   return async () => {
+//     try {
+//       document.getElementById(elem_id).setAttribute("placeholder", "Loading...");
+//       const source = await fetch('http://127.0.0.1:9202/indexfiles/' + src);
+//       const data = await source.json();
+//       document.getElementById(elem_id).setAttribute("placeholder", placeholder);
+//       return data;
+//     } catch (error) {
+//       return error;
+//     }
+//   };
+// }
 
 let selected_pub;
 function set_selection_pub(item) {
@@ -105,7 +113,7 @@ function set_selection_pub(item) {
 const pubInput = new autoComplete({
   selector: "#pub-input",
   data: {
-    src: ac_src("pub-input", "publication", "publications.json"),
+    src: indexfiles['publications'],
     keys: ["id", "name"],
     cache: true,
   },
