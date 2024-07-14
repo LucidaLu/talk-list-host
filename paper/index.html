@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+
+<head>
+  <title>QuACT Paper List</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+
+  <link rel="stylesheet" href="./autoComplete.01.min.css">
+
+  <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css" />
+
+  <!-- <link href="./style.css" rel="stylesheet"> -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-size: 1rem;
+      font-family: "PT Sans", sans-serif;
+    }
+
+    .width-control {
+      width: 90vw !important;
+      max-width: 800px !important;
+    }
+
+    .input-wrapper {
+      padding: 10px;
+      user-select: none;
+    }
+
+    .data-label {
+      color: gray;
+      width: 80px;
+      text-align: right;
+      display: inline-block;
+      padding: 10px;
+    }
+
+    .fill-remain-width {
+      width: calc(100% - 85px);
+      display: inline-block;
+    }
+
+    .autoComplete_wrapper,
+    input {
+      width: 100% !important;
+    }
+
+    table,
+    td {
+      padding: 0 !important;
+    }
+
+    #authors-table-wrapper,
+    #fundings-table-wrapper {
+      border: 2px solid;
+      border-color: rgb(241, 243, 244);
+    }
+
+
+    ::-webkit-scrollbar {
+      width: 20px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #d6dee1;
+      border-radius: 20px;
+      border: 6px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #a8bbbf;
+    }
+
+    .bg-purple {
+      background-color: rgb(119, 66, 141);
+    }
+
+    .purple {
+      color: rgb(119, 66, 141);
+    }
+  </style>
+</head>
+
+<body>
+  <section class="mw8 mw12-ns center pa3 ph5-ns">
+    <h1 class="f3 f2-m f1-l" style="color:rgb(119, 66, 141)">QuACT paper information entry</h1>
+
+    <div id="wrapper" class="width-control">
+      <div class="input-wrapper">
+        <div class="data-label">title</div>
+        <div class="fill-remain-width">
+          <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+              id="title-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+              autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+              placeholder="title">
+          </div>
+        </div>
+      </div>
+
+      <div class="input-wrapper">
+        <div class="data-label">CN title</div>
+        <div class="fill-remain-width">
+          <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+              id="cn-title-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+              autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+              placeholder="CN title">
+          </div>
+        </div>
+      </div>
+
+      <div class="input-wrapper">
+        <div class="data-label">pub</div>
+        <div class="fill-remain-width"><input id="pub-input" type="text" dir="ltr" spellcheck=false autocorrect="off"
+            autocomplete="off" autocapitalize="off" maxlength="2048" tabindex="1"></div>
+      </div>
+
+      <div class="input-wrapper">
+        <div class="data-label">raw pub</div>
+        <div class="fill-remain-width">
+          <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+              id="cn-title-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+              autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+              placeholder="i.e., STOC 2024: 56th Annual ACM Symposium on Theory of Computing">
+          </div>
+        </div>
+      </div>
+
+      <div class="input-wrapper" style="text-align: center;">
+        <div style="display:block;">
+          <div class="data-label">time</div>
+        </div>
+        <div
+          style="display:inline-block; border:2px solid;border-color: rgb(241, 243, 244); width: 100%;padding: 10px;">
+
+          <div class="data-label">submit</div>
+          <div style="display: inline-block;width:130px">
+            <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                id="volume-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                placeholder="YYYY-MM-DD">
+            </div>
+          </div>
+
+          <div class="data-label">ac</div>
+          <div style="display: inline-block;width:130px">
+            <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                id="volume-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                placeholder="YYYY-MM-DD">
+            </div>
+          </div>
+
+          <div class="data-label">pub</div>
+          <div style="display: inline-block;width:130px">
+            <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                id="volume-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                placeholder="YYYY-MM-DD">
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="input-wrapper" style="text-align: center;">
+        <div
+          style="display:inline-block; border:2px solid;border-color: rgb(241, 243, 244); width: 100%;padding: 10px;">
+          <div class="data-label">vol</div>
+          <div style="display: inline-block;width:90px">
+            <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                id="volume-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                placeholder="volume">
+            </div>
+          </div>
+
+          <div class="data-label">issue</div>
+          <div style="display: inline-block;width:80px">
+            <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                id="issue-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                placeholder="issue">
+            </div>
+          </div>
+
+          <div class="data-label">page</div>
+          <div style="display: inline-block;width:70px">
+            <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                id="page-start" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                placeholder="start">
+            </div>
+          </div>
+          <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+          <div style="display: inline-block;width:70px">
+            <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                id="page-end" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                placeholder="end">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="input-wrapper">
+        <div style="width:100%;text-align: center;">
+          <div class="data-label">authors</div>
+          <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple" style="cursor:pointer;"
+              onclick="add_people()">add</a></span>
+        </div>
+
+        <div style="width:100%; display: inline-block;">
+          <table style="width:100%" id="authors-table-wrapper">
+            <tbody id="authors-table" style="width:100% !important;display:table;">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="input-wrapper">
+        <!-- style="height:500px"> height: 350px;overflow-y: scroll;overflow-x:hidden height: 450px;overflow-y: scroll;overflow-x:hidden-->
+        <div style="width:100%;text-align: center;">
+          <div class="data-label">fundings</div><span><a class="f6 link dim ba ph3 pv2 mb2 dib purple"
+              style="cursor:pointer;" onclick="add_funding()">add</a></span>
+        </div>
+        <div style="width:100%; display: inline-block;">
+          <table style="width:100%" id="fundings-table-wrapper">
+            <tbody id="fundings-table" style="width:100% !important;display:table;">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+    </div>
+
+  </section>
+
+
+  <script src="/paper.js"></script>
+  <footer class="pv4 ph3 ph5-m ph6-l mid-gray">
+    <small class="f6 db tc">© 2024 QuACT, All Rights Reserved</small>
+    <div class="tc mt3">
+      <a href="/help" title="Help" class="f6 dib ph2 link mid-gray dim">Help</a>
+      <a href="/mail" title="Mail" class="f6 dib ph2 link mid-gray dim">Mail</a>
+      <a href="/" title="Talk" class="f6 dib ph2 link mid-gray dim">Talk</a>
+    </div>
+</body>
+
+
+</html>
