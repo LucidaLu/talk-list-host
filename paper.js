@@ -23,11 +23,15 @@ function table_entry(idx) {
 
 let resultItem = {
   element: (item, data) => {
+    console.log(data);
     item.style = "display: flex; justify-content: space-between;";
+    let sup = data.value.id ? `<sup style="color: rgba(0,0,0,.2)">${data.value.id}</sup>` : "";
     item.innerHTML = `
     <span style="white-space: initial;">
       ${data.match}
+      ${sup}
     </span>
+    
     <span style="display: flex; align-items: center; font-size: 13px; font-weight: 100; text-transform: uppercase; color: rgba(0,0,0,.2);">
       ${data.key}
     </span>`;
@@ -93,6 +97,9 @@ function set_selection_pub(item) {
         $('#pub-rank-info-wrapper').css('display', 'block');
       }
     });
+    if (document.getElementById(`raw-pub-input`).value == "") {
+      document.getElementById(`raw-pub-input`).value = item.name;
+    }
   } else {
     selected_pub = undefined;
     $('#pub-rank-info-wrapper').css('display', 'none');
@@ -142,7 +149,7 @@ let person_ac = new Array(0);
 let selected_auth = {};
 function set_selection_people(i, which, item) {
   if (item) {
-    console.log(which, item);
+    // console.log(which, item);
     document.getElementById(`auth${i}-input`).value = item[which];
     if (document.getElementById(`raw${i}-input`).value === '')
       document.getElementById(`raw${i}-input`).value = item[which];
@@ -196,7 +203,7 @@ function init_person_input(i) {
 
 
 function add_people() {
-  console.log('add_people');
+  // console.log('add_people');
   let x = document.createElement("tr");
   x.innerHTML = `<td>${table_entry(auth_cnt)}</td>`;
   document.getElementById("authors-table").appendChild(x);
@@ -209,7 +216,7 @@ function add_people() {
 let funding_ac = new Array(0), grant_ac = new Array(0), funding_cnt = 0, selected_funding = {};
 
 function set_selection_funding(i, item) {
-  console.log(item);
+  // console.log(item);
   if (item) {
     let arr = item.name.split(', grant no. ');
     if (arr.length > 1) {
@@ -392,6 +399,10 @@ function gather_paper_info() {
     "submtime": document.getElementById("submtime-input").value,
     "actime": document.getElementById("actime-input").value,
     "pubtime": document.getElementById("pubtime-input").value,
+    "vol": document.getElementById("volume-input").value,
+    "issue": document.getElementById("issue-input").value,
+    "page-start": document.getElementById("page-start").value,
+    "page-end": document.getElementById("page-end").value,
   };
 }
 
@@ -525,11 +536,91 @@ function load_paper_data(data) {
   $('#submtime-input').val(data.submtime);
   $('#actime-input').val(data.actime);
   $('#pubtime-input').val(data.pubtime);
+  $('#volume-input').val(data.vol);
+  $('#issue-input').val(data.issue);
+  $('#page-start').val(data["page-start"]);
+  $('#page-end').val(data["page-end"]);
 }
 
 function save_draft() {
-  sessionStorage.setItem("paper-info", JSON.stringify(gather_paper_info()));
+  localStorage.setItem("paper-info", JSON.stringify(gather_paper_info()));
 }
 
-load_paper_data(sessionStorage.getItem("paper-info"));
+load_paper_data(localStorage.getItem("paper-info"));
+
+
+function strftime(sFormat, date) {
+  if (!(date instanceof Date)) date = new Date();
+  var nDay = date.getDay(),
+    nDate = date.getDate(),
+    nMonth = date.getMonth(),
+    nYear = date.getFullYear(),
+    nHour = date.getHours(),
+    aDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    aMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    aDayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334],
+    isLeapYear = function () {
+      return (nYear % 4 === 0 && nYear % 100 !== 0) || nYear % 400 === 0;
+    },
+    getThursday = function () {
+      var target = new Date(date);
+      target.setDate(nDate - ((nDay + 6) % 7) + 3);
+      return target;
+    },
+    zeroPad = function (nNum, nPad) {
+      return ('' + (Math.pow(10, nPad) + nNum)).slice(1);
+    };
+  return sFormat.replace(/%[a-z]/gi, function (sMatch) {
+    return {
+      '%a': aDays[nDay].slice(0, 3),
+      '%A': aDays[nDay],
+      '%b': aMonths[nMonth].slice(0, 3),
+      '%B': aMonths[nMonth],
+      '%c': date.toUTCString(),
+      '%C': Math.floor(nYear / 100),
+      '%d': zeroPad(nDate, 2),
+      '%e': nDate,
+      '%F': date.toISOString().slice(0, 10),
+      '%G': getThursday().getFullYear(),
+      '%g': ('' + getThursday().getFullYear()).slice(2),
+      '%H': zeroPad(nHour, 2),
+      '%I': zeroPad((nHour + 11) % 12 + 1, 2),
+      '%j': zeroPad(aDayCount[nMonth] + nDate + ((nMonth > 1 && isLeapYear()) ? 1 : 0), 3),
+      '%k': '' + nHour,
+      '%l': (nHour + 11) % 12 + 1,
+      '%m': zeroPad(nMonth + 1, 2),
+      '%M': zeroPad(date.getMinutes(), 2),
+      '%p': (nHour < 12) ? 'AM' : 'PM',
+      '%P': (nHour < 12) ? 'am' : 'pm',
+      '%s': Math.round(date.getTime() / 1000),
+      '%S': zeroPad(date.getSeconds(), 2),
+      '%u': nDay || 7,
+      '%V': (function () {
+        var target = getThursday(),
+          n1stThu = target.valueOf();
+        target.setMonth(0, 1);
+        var nJan1 = target.getDay();
+        if (nJan1 !== 4) target.setMonth(0, 1 + ((4 - nJan1) + 7) % 7);
+        return zeroPad(1 + Math.ceil((n1stThu - target) / 604800000), 2);
+      })(),
+      '%w': '' + nDay,
+      '%x': date.toLocaleDateString(),
+      '%X': date.toLocaleTimeString(),
+      '%y': ('' + nYear).slice(2),
+      '%Y': nYear,
+      '%z': date.toTimeString().replace(/.+GMT([+-]\d+).+/, '$1'),
+      '%Z': date.toTimeString().replace(/.+\((.+?)\)$/, '$1')
+    }[sMatch] || sMatch;
+  });
+}
+
+for (let elem of ['#submtime-input', '#actime-input', '#pubtime-input']) {
+  $(elem).on('input', function () {
+    let d = Date.parse($(elem).val());
+    if (!isNaN(d)) {
+      $(elem).val(strftime('%Y-%m-%d', new Date(d)));
+    }
+  });
+}
+
 
