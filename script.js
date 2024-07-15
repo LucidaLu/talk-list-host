@@ -477,30 +477,33 @@ function generate_mail() {
 <p ${P_STYLE}>下面是本周活动安排：</p>
 <p>&nbsp;</p>`;
   let notes = [];
-  for (let i of active_prd) {
-    let data = prd_data[i - 1];
-    let cite_obj = new Cite(data['doi']);
+  if (document.getElementById('reading-check').checked) {
+    for (let i of active_prd) {
+      let data = prd_data[i - 1];
+      let cite_obj = new Cite(data['doi']);
 
-    let sym = ''.padStart(notes.length + 1, '*');
-    let no = notes.length + 1;
-    notes.push(`<p ${P_STYLE} id="footnote-${no}"><sup>${sym}</sup> ${remove_outdiv(cite_obj.format('bibliography', {
-      format: 'html',
-      template: 'apa',
-      lang: 'en-US'
-    }))}</p>`);
+      let sym = ''.padStart(notes.length + 1, '*');
+      let no = notes.length + 1;
+      notes.push(`<p ${P_STYLE} id="footnote-${no}"><sup>${sym}</sup> ${remove_outdiv(cite_obj.format('bibliography', {
+        format: 'html',
+        template: 'apa',
+        lang: 'en-US'
+      }))}</p>`);
 
-    s += `<p ${P_STYLE}><strong>内　容：paper reading</strong>（${data['student']}）</p>
+      s += `<p ${P_STYLE}><strong>内　容：paper reading</strong>（${data['student']}）</p>
 <p ${P_STYLE}><strong>论　文：</strong>${cite_obj.get()[0]['title']}<sup>${sym}</sup>（见附件）</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
 <p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/vgWvFfibhmRA">612-2691-6328</a></p>
 
 <p>&nbsp;</p>
 `
+    }
   }
-  for (let i of active_speaker) {
-    let data = global_data[i - 1];
+  if (document.getElementById('speaker-check').checked) {
+    for (let i of active_speaker) {
+      let data = global_data[i - 1];
 
-    s += `<p ${P_STYLE}><strong>内　容：QuACT讲座</strong></p>
+      s += `<p ${P_STYLE}><strong>内　容：QuACT讲座</strong></p>
 <p ${P_STYLE}><strong>题　目：</strong><a href="${data['wechat-link']}">${data['title']}</a></p>
 <p ${P_STYLE}><strong>讲　者：</strong>${data['presenter']}，${data['affiliation']}</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
@@ -508,16 +511,19 @@ function generate_mail() {
 
 <p>&nbsp;</p>
 `;
+    }
   }
 
-  for (let i of active_report) {
-    let data = reports_data[i - 1];
-    s += `<p ${P_STYLE}><strong>内　容：组会</strong>（${data['student']}半小时报告 + 每人5分钟报告）</p>
+  if (document.getElementById('report-check').checked) {
+    for (let i of active_report) {
+      let data = reports_data[i - 1];
+      s += `<p ${P_STYLE}><strong>内　容：组会</strong>（${data['student']}半小时报告 + 每人5分钟报告）</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`, 2)}</p>
 <p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/NHZnA7sCte1P">722-5788-8455</a></p>
 
 <p>&nbsp;</p>
 `;
+    }
   }
 
 

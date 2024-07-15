@@ -99,6 +99,10 @@
       padding-left: 10px;
       background-color: #a8bbbf;
     }
+
+    #author-funding-entry {
+      min-height: 85vh;
+    }
   </style>
 </head>
 
@@ -123,7 +127,7 @@
                   placeholder="funding title">
               </div>
             </div>
-            <div style="padding: 10px;"></div>
+            <!-- <div style="padding: 10px;"></div>
             <div class="data-label">grant no.</div>
             <div class="fill-remain-width" style="width: calc(100% - 110px);">
               <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
@@ -131,7 +135,7 @@
                   autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
                   placeholder="grant no.">
               </div>
-            </div>
+            </div> -->
           </div>
 
           <div style="text-align: center;padding-top: 20px;">
@@ -173,10 +177,17 @@
       </div>
     </section>
 
-    <section class="mw8 mw12-ns center pa3 ph5-ns width-control" id="paper-info-entry">
+    <section class="mw8 mw12-ns center pa3 ph5-ns width-control" id="paper-info-entry" style="display: none;">
       <h1 class="f3 f2-m f1-l" style="color:rgb(119, 66, 141)">QuACT paper information entry</h1>
       <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple" style="cursor:pointer;" onclick="switch_to(0)">switch to
           author & funding</a></span>
+      <span style="padding-left:10px"></span>
+      <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple" style="cursor:pointer;"
+          onclick="save_draft()">save</a></span>
+      <span style="padding-left:10px"></span>
+      <span><a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple" style="cursor: pointer"
+          onclick="submit_paper()">submit</a>
+      </span>
       <div id="wrapper" class="">
         <div class="input-wrapper">
           <div class="data-label">title</div>
@@ -233,7 +244,7 @@
             <div class="data-label">submit</div>
             <div style="display: inline-block;width:130px">
               <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
-                  id="subm-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                  id="submtime-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
                   autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
                   placeholder="YYYY-MM-DD">
               </div>
@@ -242,7 +253,7 @@
             <div class="data-label">ac</div>
             <div style="display: inline-block;width:130px">
               <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
-                  id="ac-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                  id="actime-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
                   autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
                   placeholder="YYYY-MM-DD">
               </div>
@@ -251,7 +262,7 @@
             <div class="data-label">pub</div>
             <div style="display: inline-block;width:130px">
               <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
-                  id="pub-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                  id="pubtime-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
                   autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
                   placeholder="YYYY-MM-DD">
               </div>
@@ -337,10 +348,7 @@
           </div>
         </div>
 
-        <div style="text-align: center;padding-top:20px">
-          <a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple" style="cursor: pointer"
-            onclick="submit_paper()">submit</a>
-        </div>
+
       </div>
 
     </section>
@@ -348,7 +356,7 @@
 
   <script src="/assets/jquery-3.7.1.min.js"></script>
   <script src="/paper.js"></script>
-  <footer class="pv4 ph3 ph5-m ph6-l mid-gray">
+  <footer class="pv4 ph3 ph5-m ph6-l mid-gray" style="user-select: none;">
     <small class="f6 db tc">© 2024 QuACT, All Rights Reserved</small>
     <div class="tc mt3">
       <a href="/help" title="Help" class="f6 dib ph2 link mid-gray dim">Help</a>

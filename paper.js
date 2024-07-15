@@ -22,7 +22,7 @@ let resultItem = {
   element: (item, data) => {
     item.style = "display: flex; justify-content: space-between;";
     item.innerHTML = `
-    <span style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+    <span style="white-space: initial;">
       ${data.match}
     </span>
     <span style="display: flex; align-items: center; font-size: 13px; font-weight: 100; text-transform: uppercase; color: rgba(0,0,0,.2);">
@@ -48,31 +48,17 @@ let resultItem = {
 
 $.get({
   async: false,
-  url: 'http://127.0.0.1:9202/files/index.json',
+  url: 'http://127.0.0.1:9202/index',
   success: function (data) {
     indexfiles = data;
   }
 });
 
-// function ac_src(elem_id, placeholder, src) {
-//   return async () => {
-//     try {
-//       document.getElementById(elem_id).setAttribute("placeholder", "Loading...");
-//       const source = await fetch('http://127.0.0.1:9202/indexfiles/' + src);
-//       const data = await source.json();
-//       document.getElementById(elem_id).setAttribute("placeholder", placeholder);
-//       return data;
-//     } catch (error) {
-//       return error;
-//     }
-//   };
-// }
-
 let selected_pub;
 function set_selection_pub(item) {
   if (item) {
     document.getElementById("pub-input").value = item.name;
-    selected_pub = item.id;
+    selected_pub = item;
     $.ajax({
       type: "POST",
       url: "http://127.0.0.1:9202/pubrank",
@@ -124,15 +110,25 @@ const pubInput = new autoComplete({
   events: {
     input: {
       focus() {
+        pubInput.input.style.color = '#7b7b7b';
         if (pubInput.input.value.length) {
-          set_selection_pub(undefined);
           pubInput.start();
         }
       },
+      input() {
+        set_selection_pub(undefined);
+        if (pubInput.input.value.length) {
+          pubInput.start();
+        }
+      },
+      focusout() {
+        console.log('focusout');
+        if (selected_pub == undefined) {
+          pubInput.input.style.color = 'red';
+        }
+      },
       selection(event) {
-        const feedback = event.detail;
-        pubInput.input.blur();
-        set_selection_pub(feedback.selection.value);
+        set_selection_pub(event.detail.selection.value);
       },
     },
   },
@@ -148,7 +144,7 @@ function set_selection_people(i, which, item) {
     if (document.getElementById(`raw${i}-input`).value === '')
       document.getElementById(`raw${i}-input`).value = item[which];
     // document.getElementById(`note${i}-input`).value = cn;
-    selected_auth[i] = item.id;
+    selected_auth[i] = { id: item.id, name: item[which] };
   } else {
     selected_auth[i] = undefined;
   }
@@ -158,9 +154,8 @@ function init_person_input(i) {
   person_ac[i] = new autoComplete({
     selector: `#auth${i}-input`,
     data: {
-      src: ac_src(`auth${i}-input`, `name #${i + 1}`, "people.json"),
+      src: indexfiles['people'],
       keys: ["id", "en", "cn"],
-      cache: true,
     },
     placeHolder: `name #${i + 1}`,
     resultsList: resultsList,
@@ -170,14 +165,25 @@ function init_person_input(i) {
     events: {
       input: {
         focus() {
+          person_ac[i].input.style.color = '#7b7b7b';
           if (person_ac[i].input.value.length) {
-            set_selection_people(i);
             person_ac[i].start();
+          }
+        },
+        input() {
+          set_selection_people(i);
+          if (person_ac[i].input.value.length) {
+            person_ac[i].start();
+          }
+        },
+        focusout() {
+          console.log('focusout');
+          if (!(i in selected_auth) || selected_auth[i] == undefined) {
+            person_ac[i].input.style.color = 'red';
           }
         },
         selection(event) {
           const feedback = event.detail;
-          person_ac[i].input.blur();
           set_selection_people(i, feedback.selection.key, feedback.selection.value);
         },
       },
@@ -197,12 +203,20 @@ function add_people() {
 }
 
 
-let funding_ac = new Array(0), funding_cnt = 0, selected_funding = {};
+let funding_ac = new Array(0), grant_ac = new Array(0), funding_cnt = 0, selected_funding = {};
 
 function set_selection_funding(i, item) {
+  console.log(item);
   if (item) {
-    document.getElementById(`funding${i}-input`).value = item.name;
-    selected_funding[i] = item.name;
+    let arr = item.name.split(', grant no. ');
+    if (arr.length > 1) {
+      document.getElementById(`funding${i}-input`).value = arr[0];
+      document.getElementById(`grant${i}-input`).value = arr[1];
+      selected_funding[i] = arr;
+    } else {
+      document.getElementById(`funding${i}-input`).value = item.name;
+      selected_funding[i] = [item.name];
+    }
   } else {
     selected_funding[i] = undefined;
   }
@@ -212,11 +226,11 @@ function init_funding_input(i) {
   funding_ac[i] = new autoComplete({
     selector: `#funding${i}-input`,
     data: {
-      src: ac_src(`funding${i}-input`, `funding #${i + 1}`, "funding.json"),
+      src: indexfiles['funding-title'],
       keys: ["name"],
       cache: true,
     },
-    placeHolder: `funding${i}-input`,
+    placeHolder: `funding #${i + 1}`,
     resultsList: resultsList,
     resultItem: resultItem,
     searchEngine: "strict",
@@ -224,14 +238,64 @@ function init_funding_input(i) {
     events: {
       input: {
         focus() {
+          funding_ac[i].input.style.color = '#7b7b7b';
           if (funding_ac[i].input.value.length) {
-            set_selection_funding(i, undefined);
             funding_ac[i].start();
+          }
+        },
+        input() {
+          console.log('123');
+          set_selection_funding(i);
+          if (funding_ac[i].input.value.length) {
+            funding_ac[i].start();
+          }
+        },
+        focusout() {
+          console.log('focusout');
+          if (!(i in selected_funding) || selected_funding[i] == undefined) {
+            funding_ac[i].input.style.color = 'red';
           }
         },
         selection(event) {
           const feedback = event.detail;
-          funding_ac[i].input.blur();
+          set_selection_funding(i, feedback.selection.value);
+        },
+      },
+    },
+  });
+  grant_ac[i] = new autoComplete({
+    selector: `#grant${i}-input`,
+    data: {
+      src: indexfiles['funding'],
+      keys: ["name"],
+      cache: true,
+    },
+    placeHolder: `grant #${i + 1}`,
+    resultsList: resultsList,
+    resultItem: resultItem,
+    searchEngine: "strict",
+
+    events: {
+      input: {
+        focus() {
+          grant_ac[i].input.style.color = '#7b7b7b';
+          if (grant_ac[i].input.value.length) {
+            grant_ac[i].start();
+          }
+        },
+        input() {
+          console.log('123');
+          set_selection_funding(i);
+          if (grant_ac[i].input.value.length) {
+            grant_ac[i].start();
+          }
+        },
+        focusout() {
+          console.log('focusout');
+        },
+        selection(event) {
+          const feedback = event.detail;
+          grant_ac[i].input.blur();
           set_selection_funding(i, feedback.selection.value);
         },
       },
@@ -241,18 +305,24 @@ function init_funding_input(i) {
 
 function add_funding() {
   let x = document.createElement("tr");
-  x.innerHTML = `<td><div style="display:inline-block;width:100%;padding:10px">
+  x.innerHTML = `<td><div style="display:inline-block;width:500px;padding:10px">
     <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
         id="funding${funding_cnt}-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
         autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both" placeholder="funding #${funding_cnt + 1}">
     </div>
+  </div>
+  <div style="display:inline-block;width:calc(100% - 510px);padding:10px">
+    <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+        id="grant${funding_cnt}-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+        autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both" placeholder="grant #${funding_cnt + 1}">
+    </div>
   </div></td>`;
   document.getElementById("fundings-table").appendChild(x);
   funding_ac.push(null);
+  grant_ac.push(null);
   init_funding_input(funding_cnt);
   funding_cnt += 1;
 }
-
 
 for (let i = 0; i < 5; ++i) {
   add_people();
@@ -268,6 +338,7 @@ function switch_to(x) {
       document.getElementById("paper-info-entry").style.display = "block";
     }, 300);
   } else {
+    save_draft();
     document.getElementById("author-funding-entry").style.opacity = 1;
     document.getElementById("paper-info-entry").style.opacity = 0;
     setTimeout(() => {
@@ -277,13 +348,18 @@ function switch_to(x) {
   }
 }
 
-switch_to(0);
-function submit_paper() {
+setTimeout(() => {
+  $('#paper-info-entry').css('display', 'block');
+}, 100);
+// switch_to(0);
+
+function gather_paper_info() {
   let authors = [];
   for (let i = 0; i < auth_cnt; ++i) {
     if (i in selected_auth && selected_auth[i] != undefined) {
       authors.push({
-        "id": selected_auth[i],
+        "id": selected_auth[i].id,
+        "name": selected_auth[i].name,
         "raw": document.getElementById(`raw${i}-input`).value,
         "note": document.getElementById(`note${i}-input`).value
       });
@@ -291,25 +367,64 @@ function submit_paper() {
   }
 
   let fundings = [];
+  console.log(selected_funding);
   for (let i = 0; i < funding_cnt; ++i) {
     if (i in selected_funding && selected_funding[i] != undefined) {
       fundings.push({
-        "name": selected_funding[i]
+        "name": selected_funding[i][0],
+        "grant": selected_funding[i].length > 1 ? selected_funding[i][1] : undefined
       });
     }
   }
+  console.log(selected_pub);
 
-  let data = {
+  return {
     "title": document.getElementById("title-input").value,
     "CN title": document.getElementById("cn-title-input").value,
     "pub": selected_pub,
     "raw-pub": document.getElementById("raw-pub-input").value,
     "authors": authors,
     "eq-contrb": document.getElementById("eq-contrb").checked,
-    "fundings": fundings
+    "fundings": fundings,
+    "submtime": document.getElementById("submtime-input").value,
+    "actime": document.getElementById("actime-input").value,
+    "pubtime": document.getElementById("pubtime-input").value,
   };
+}
 
+function submit_paper() {
+  let data = gather_paper_info();
   console.log(data);
+  $.ajax({
+    type: "POST",
+    url: "http://127.0.0.1:9202/addpaper",
+    data: { data: JSON.stringify(data) },
+    success: function (data) {
+      console.log(data);
+      // reload_ac();
+    }
+  });
+}
+
+function reload_ac() {
+  // $.get({
+  //   async: false,
+  //   url: 'http://127.0.0.1:9202/index',
+  //   success: function (data) {
+  //     indexfiles = data;
+  //   }
+  // });
+
+  // for (let i = 0; i < auth_cnt; ++i) {
+  //   init_person_input(i);
+  // }
+  // for (let i = 0; i < funding_cnt; ++i) {
+  //   init_funding_input(i);
+  // }
+  // init_new_fund_title_ac();
+
+  // refresh page
+  location.reload();
 }
 
 function submit_author() {
@@ -324,42 +439,46 @@ function submit_author() {
     data: data,
     success: function (data) {
       console.log(data);
+      reload_ac();
     }
   });
 }
 
-let new_fund_title_ac = new autoComplete({
-  selector: `#fund-title-input`,
-  data: {
-    src: ac_src(`fund-title-input`, `funding name`, "funding-title.json"),
-    keys: ["name"],
-    cache: true,
-  },
-  placeHolder: `fund-title-input`,
-  resultsList: resultsList,
-  resultItem: resultItem,
-  searchEngine: "strict",
+let new_fund_title_ac;
+function init_new_fund_title_ac() {
+  new_fund_title_ac = new autoComplete({
+    selector: `#fund-title-input`,
+    data: {
+      src: indexfiles["funding-title"],
+      keys: ["name"],
+      cache: true,
+    },
+    placeHolder: `funding title`,
+    resultsList: resultsList,
+    resultItem: resultItem,
+    searchEngine: "strict",
 
-  events: {
-    input: {
-      focus() {
-        if (new_fund_title_ac.input.value.length) {
-          new_fund_title_ac.start();
-        }
-      },
-      selection(event) {
-        const feedback = event.detail;
-        new_fund_title_ac.input.blur();
-        document.getElementById("fund-title-input").value = feedback.selection.value.name;
+    events: {
+      input: {
+        focus() {
+          if (new_fund_title_ac.input.value.length) {
+            new_fund_title_ac.start();
+          }
+        },
+        selection(event) {
+          const feedback = event.detail;
+          new_fund_title_ac.input.blur();
+          document.getElementById("fund-title-input").value = feedback.selection.value.name;
+        },
       },
     },
-  },
-});
+  });
+}
+init_new_fund_title_ac();
 
 function submit_funding() {
   let data = {
     "title": document.getElementById("fund-title-input").value,
-    "grant": document.getElementById("fund-grant-input").value
   };
   $.ajax({
     type: "POST",
@@ -367,6 +486,47 @@ function submit_funding() {
     data: data,
     success: function (data) {
       console.log(data);
+      reload_ac();
     }
   });
 }
+
+
+function load_paper_data(data) {
+  data = JSON.parse(data);
+  console.log(data);
+  $('#title-input').val(data.title);
+  $('#cn-title-input').val(data["CN title"]);
+  $('#raw-pub-input').val(data["raw-pub"]);
+  set_selection_pub(data.pub);
+  for (let i = 0; i < data.authors.length; ++i) {
+    if (i == auth_cnt) add_people();
+    $(`#auth${i}-input`).val(data.authors[i].name);
+    $(`#raw${i}-input`).val(data.authors[i].raw);
+    $(`#note${i}-input`).val(data.authors[i].note);
+    set_selection_people(i, 'name', { id: data.authors[i].id, name: data.authors[i].name });
+  }
+  for (let i = 0; i < data.fundings.length; ++i) {
+    if (i == funding_cnt) add_funding();
+    $(`#funding${i}-input`).val(data.fundings[i].name);
+    $(`#grant${i}-input`).val(data.fundings[i].grant);
+    let full = data.fundings[i].name;
+    if (data.fundings[i].grant) {
+      full += ', grant no. ' + data.fundings[i].grant;
+    }
+    set_selection_funding(i, { name: full });
+  }
+  if (data["eq-contrb"]) {
+    document.getElementById("eq-contrb").checked = true;
+  }
+  $('#submtime-input').val(data.submtime);
+  $('#actime-input').val(data.actime);
+  $('#pubtime-input').val(data.pubtime);
+}
+
+function save_draft() {
+  sessionStorage.setItem("paper-info", JSON.stringify(gather_paper_info()));
+}
+
+load_paper_data(sessionStorage.getItem("paper-info"));
+
