@@ -478,6 +478,9 @@ function generate_mail() {
 <p>&nbsp;</p>`;
   let notes = [];
   if (document.getElementById('reading-check').checked) {
+    if (active_prd.length == 0) {
+      alert('请至少选择一个paper reading，如果这周没有，也选一个，然后把勾去掉，因为要根据当前的时间计算后面五周的预告');
+    }
     for (let i of active_prd) {
       let data = prd_data[i - 1];
       let cite_obj = new Cite(data['doi']);
@@ -515,6 +518,10 @@ function generate_mail() {
   }
 
   if (document.getElementById('report-check').checked) {
+    if (len(active_report) == 0) {
+      alert('请至少选择一个组会报告，如果这周没有，也选一个，然后把勾去掉，因为要根据当前的时间计算后面五周的预告');
+      return;
+    }
     for (let i of active_report) {
       let data = reports_data[i - 1];
       s += `<p ${P_STYLE}><strong>内　容：组会</strong>（${data['student']}半小时报告 + 每人5分钟报告）</p>
