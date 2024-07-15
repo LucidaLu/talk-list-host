@@ -14,12 +14,16 @@ function table_entry(idx) {
     </div>
   </div>
   <div style="display:inline-block;width:calc(100% - 510px);padding:10px">
-    <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
-        id="note${idx}-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
-        autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both" placeholder="note #${idx + 1}">
+    <input id="note${idx}-input" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
+      autocapitalize="off" maxlength="2048" tabindex="1">
     </div>
   </div>`;
 }
+/*
+<div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+        id="note${idx}-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+        autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both" placeholder="note #${idx + 1}">
+*/
 
 let resultItem = {
   element: (item, data) => {
@@ -31,7 +35,6 @@ let resultItem = {
       ${data.match}
       ${sup}
     </span>
-    
     <span style="display: flex; align-items: center; font-size: 13px; font-weight: 100; text-transform: uppercase; color: rgba(0,0,0,.2);">
       ${data.key}
     </span>`;
@@ -145,7 +148,7 @@ const pubInput = new autoComplete({
 });
 
 let auth_cnt = 0;
-let person_ac = new Array(0);
+let person_ac = new Array(0), person_note_ac = new Array(0);
 let selected_auth = {};
 function set_selection_people(i, which, item) {
   if (item) {
@@ -199,6 +202,47 @@ function init_person_input(i) {
       },
     },
   });
+
+  person_note_ac[i] = new autoComplete({
+    selector: `#note${i}-input`,
+    data: {
+      src: [{
+        "note": "corresponding"
+      }],
+      keys: ["note"],
+    },
+    placeHolder: `note #${i + 1}`,
+    resultsList: resultsList,
+    resultItem: resultItem,
+    searchEngine: "strict",
+
+    events: {
+      input: {
+        focus() {
+          person_note_ac[i].input.style.color = '#7b7b7b';
+          if (person_note_ac[i].input.value.length) {
+            person_note_ac[i].start();
+          }
+        },
+        input() {
+          // set_selection_note(i);
+          if (person_note_ac[i].input.value.length) {
+            person_note_ac[i].start();
+          }
+        },
+        focusout() {
+          console.log('focusout');
+          if (!(i in selected_auth) || selected_auth[i] == undefined) {
+            person_note_ac[i].input.style.color = 'red';
+          }
+        },
+        selection(event) {
+          const feedback = event.detail;
+          set_selection_note(i, feedback.selection.value);
+        },
+      },
+    },
+  });
 }
 
 
@@ -208,6 +252,7 @@ function add_people() {
   x.innerHTML = `<td>${table_entry(auth_cnt)}</td>`;
   document.getElementById("authors-table").appendChild(x);
   person_ac.push(null);
+  person_note_ac.push(null);
   init_person_input(auth_cnt);
   auth_cnt++;
 }
