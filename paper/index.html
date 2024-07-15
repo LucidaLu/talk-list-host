@@ -19,6 +19,12 @@
       padding: 0;
       font-size: 1rem;
       font-family: "PT Sans", sans-serif;
+      user-select: none;
+    }
+
+    .my-button {
+      cursor: pointer;
+      user-select: none;
     }
 
     .width-control {
@@ -110,7 +116,7 @@
   <div>
     <section class="mw8 mw12-ns center pa3 ph5-ns width-control" id="author-funding-entry" style="display: none;">
       <h1 class="f3 f2-m f1-l" style="color:rgb(119, 66, 141)">QuACT author & funding entry</h1>
-      <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple" style="cursor:pointer;" onclick="switch_to(1)">switch to
+      <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple my-button" onclick="switch_to(1)">switch to
           paper</a></span>
       <div class="input-wrapper" style="text-align: center;">
         <div
@@ -139,8 +145,7 @@
           </div>
 
           <div style="text-align: center;padding-top: 20px;">
-            <a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple" style="cursor: pointer;"
-              onclick="submit_funding()">submit</a>
+            <a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple my-button" onclick="submit_funding()">submit</a>
           </div>
         </div>
 
@@ -169,8 +174,7 @@
           </div>
 
           <div style="text-align: center;padding-top: 20px;">
-            <a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple" style="cursor: pointer;"
-              onclick="submit_author()">submit</a>
+            <a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple my-button" onclick="submit_author()">submit</a>
           </div>
         </div>
 
@@ -179,14 +183,12 @@
 
     <section class="mw8 mw12-ns center pa3 ph5-ns width-control" id="paper-info-entry" style="display: none;">
       <h1 class="f3 f2-m f1-l" style="color:rgb(119, 66, 141)">QuACT paper information entry</h1>
-      <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple" style="cursor:pointer;" onclick="switch_to(0)">switch to
+      <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple my-button" onclick="switch_to(0)">switch to
           author & funding</a></span>
       <span style="padding-left:10px"></span>
-      <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple" style="cursor:pointer;"
-          onclick="save_draft()">save</a></span>
+      <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple my-button" onclick="save_draft()">save</a></span>
       <span style="padding-left:10px"></span>
-      <span><a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple" style="cursor: pointer"
-          onclick="submit_paper()">submit</a>
+      <span><a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple my-button" onclick="submit_paper()">submit</a>
       </span>
       <div id="wrapper" class="">
         <div class="input-wrapper">
@@ -321,8 +323,8 @@
               <label for="eq-contrb" style="color:rgb(119, 66, 141);vertical-align: middle;">equal
                 contribution</label>
             </div>
-            <span style="padding-left:5px;"><a class="f6 link dim ba ph3 pv2 mb2 dib purple"
-                style="cursor:pointer;padding: 1px 5px 1px 5px;" onclick="add_people()">+</a></span>
+            <span style="padding-left:5px;"><a class="f6 link dim ba ph3 pv2 mb2 dib purple my-button"
+                style="padding: 1px 5px 1px 5px;" onclick="add_people()">+</a></span>
 
           </div>
 
@@ -337,8 +339,8 @@
         <div class="input-wrapper">
           <!-- style="height:500px"> height: 350px;overflow-y: scroll;overflow-x:hidden height: 450px;overflow-y: scroll;overflow-x:hidden-->
           <div style="width:100%;text-align: center;">
-            <div class="data-label">fundings</div><span><a class="f6 link dim ba ph3 pv2 mb2 dib purple"
-                style="cursor:pointer;padding: 1px 5px 1px 5px;" onclick="add_funding()">+</a></span>
+            <div class="data-label">fundings</div><span><a class="f6 link dim ba ph3 pv2 mb2 dib purple my-button"
+                style="padding: 1px 5px 1px 5px;" onclick="add_funding()">+</a></span>
           </div>
           <div style="width:100%; display: inline-block;">
             <table style="width:100%" id="fundings-table-wrapper">
@@ -364,6 +366,5 @@
       <a href="/" title="Talk" class="f6 dib ph2 link mid-gray dim">Talk</a>
     </div>
 </body>
-
 
 </html>

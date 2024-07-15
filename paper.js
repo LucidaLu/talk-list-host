@@ -1,4 +1,7 @@
 //  'vol', 'page', 'doi', 'submission time', 'acceptance time', 'publication time', 'funding'
+
+let host_url = 'http://10.206.32.47:5739';
+
 function table_entry(idx) {
   return `<div style="display:inline-block;width:250px;padding:10px">
     <input id="auth${idx}-input" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
@@ -48,7 +51,7 @@ let resultItem = {
 
 $.get({
   async: false,
-  url: 'http://127.0.0.1:9202/index',
+  url: host_url + "/index",
   success: function (data) {
     indexfiles = data;
   }
@@ -61,7 +64,7 @@ function set_selection_pub(item) {
     selected_pub = item;
     $.ajax({
       type: "POST",
-      url: "http://127.0.0.1:9202/pubrank",
+      url: host_url + "/pubrank",
       data: { pub: item.id },
       success: function (data) {
         let s = '';
@@ -397,7 +400,7 @@ function submit_paper() {
   console.log(data);
   $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:9202/addpaper",
+    url: host_url + "/addpaper",
     data: { data: JSON.stringify(data) },
     success: function (data) {
       console.log(data);
@@ -409,7 +412,7 @@ function submit_paper() {
 function reload_ac() {
   // $.get({
   //   async: false,
-  //   url: 'http://127.0.0.1:9202/index',
+  //   url: host+'/index',
   //   success: function (data) {
   //     indexfiles = data;
   //   }
@@ -435,7 +438,7 @@ function submit_author() {
 
   $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:9202/addauthor",
+    url: host_url + "/addauthor",
     data: data,
     success: function (data) {
       console.log(data);
@@ -482,7 +485,7 @@ function submit_funding() {
   };
   $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:9202/addfund",
+    url: host_url + "/addfund",
     data: data,
     success: function (data) {
       console.log(data);
