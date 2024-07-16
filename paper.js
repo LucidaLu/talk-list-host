@@ -737,8 +737,10 @@ function strftime(sFormat, date) {
 }
 
 for (let elem of ['#submtime-input', '#actime-input', '#pubtime-input']) {
-  $(elem).on('input', function () {
+  console.log(elem);
+  $(elem).on('focusout', function () {
     let d = Date.parse($(elem).val());
+    console.log(d);
     if (!isNaN(d)) {
       $(elem).val(strftime('%Y-%m-%d', new Date(d)));
     }
@@ -762,4 +764,9 @@ function save_paper() {
       location.reload();
     }
   });
+}
+
+function clear_all() {
+  localStorage.removeItem("paper-info");
+  location.reload();
 }
