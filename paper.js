@@ -1,7 +1,8 @@
 //  'vol', 'page', 'doi', 'submission time', 'acceptance time', 'publication time', 'funding'
 
 // let host_url = 'http://10.206.32.47:5739';
-let host_url = 'http://127.0.0.1:5739';
+let host_url = 'http://10.206.32.47:5739';
+//'http://127.0.0.1:5739';
 
 function table_entry(idx) {
   return `<div style="display:inline-block;width:calc(50% - 80px);padding:10px">
