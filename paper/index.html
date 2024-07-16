@@ -65,6 +65,7 @@
     #fundings-table-wrapper {
       border: 2px solid;
       border-color: rgb(241, 243, 244);
+      min-height: 50px;
     }
 
 
@@ -186,35 +187,42 @@
       <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple my-button" onclick="switch_to(0)">switch to
           author & funding</a></span>
       <span style="padding-left:10px"></span>
-      <span><a class="f6 link dim ba ph3 pv2 mb2 dib purple my-button" onclick="save_draft()">save</a></span>
-      <span style="padding-left:10px"></span>
       <span><a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple my-button" onclick="submit_paper()">submit</a>
       </span>
+      <span style="padding-left:10px"></span>
+      <span id="save-btn" style="visibility: hidden;"><a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple my-button"
+          onclick="save_paper()">save</a></span>
       <div id="wrapper" class="">
         <div class="input-wrapper">
           <div class="data-label">title</div>
-          <div class="fill-remain-width">
+          <!-- <div class="fill-remain-width">
             <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
                 id="title-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
                 autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
                 placeholder="title">
             </div>
-          </div>
+          </div> -->
+          <div class="fill-remain-width"><input id="title-input" type="text" dir="ltr" spellcheck=false
+              autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="2048" tabindex="1"></div>
         </div>
 
         <div class="input-wrapper">
           <div class="data-label">CN title</div>
+          <!--
           <div class="fill-remain-width">
-            <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+              
+              <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
                 id="cn-title-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
                 autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
                 placeholder="CN title">
-            </div>
           </div>
+            </div> -->
+          <div class="fill-remain-width"><input id="cn-title-input" type="text" dir="ltr" spellcheck=false
+              autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="2048" tabindex="1"></div>
         </div>
 
         <div class="input-wrapper">
-          <div class="data-label">pub</div>
+          <div class="data-label">publ</div>
           <div class="fill-remain-width"><input id="pub-input" type="text" dir="ltr" spellcheck=false autocorrect="off"
               autocomplete="off" autocapitalize="off" maxlength="2048" tabindex="1"></div>
         </div>
@@ -226,7 +234,7 @@
         </div>
 
         <div class="input-wrapper">
-          <div class="data-label">raw pub</div>
+          <div class="data-label">raw publ</div>
           <div class="fill-remain-width">
             <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
                 id="raw-pub-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
@@ -243,7 +251,7 @@
           <div
             style="display:inline-block; border:2px solid;border-color: rgb(241, 243, 244); width: 100%;padding: 10px;">
 
-            <div class="data-label">submit</div>
+            <div class="data-label">submission</div>
             <div style="display: inline-block;width:130px">
               <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
                   id="submtime-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
@@ -252,7 +260,7 @@
               </div>
             </div>
 
-            <div class="data-label">ac</div>
+            <div class="data-label">ac / notification</div>
             <div style="display: inline-block;width:130px">
               <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
                   id="actime-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
@@ -261,7 +269,7 @@
               </div>
             </div>
 
-            <div class="data-label">pub</div>
+            <div class="data-label">publication</div>
             <div style="display: inline-block;width:130px">
               <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
                   id="pubtime-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"

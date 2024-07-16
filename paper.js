@@ -1,33 +1,49 @@
 //  'vol', 'page', 'doi', 'submission time', 'acceptance time', 'publication time', 'funding'
 
-let host_url = 'http://10.206.32.47:5739';
+// let host_url = 'http://10.206.32.47:5739';
+let host_url = 'http://127.0.0.1:5739';
 
 function table_entry(idx) {
-  return `<div style="display:inline-block;width:250px;padding:10px">
+  return `<div style="display:inline-block;width:calc(50% - 80px);padding:10px">
     <input id="auth${idx}-input" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
       autocapitalize="off" maxlength="2048" tabindex="1">
   </div>
-  <div style="display:inline-block;width:250px;padding:10px">
+  <div style="display:inline-block;width:calc(50% - 80px);padding:10px">
     <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
         id="raw${idx}-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
         autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both" placeholder="raw name #${idx + 1}">
     </div>
   </div>
-  <div style="display:inline-block;width:calc(100% - 510px);padding:10px">
-    <input id="note${idx}-input" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
-      autocapitalize="off" maxlength="2048" tabindex="1">
-    </div>
+  <div class="items-center" style="display: inline-block;height:100%;vertical-align:middle;padding:10px 10px 10px 10px">
+  <table style="display:inline">
+  <tbody>
+  <tr><td>
+    <input type="checkbox" id="corresp${idx}" style="width:auto !important;vertical-align: middle;">
+    <label for="corresp${idx}" style="color:rgb(119, 66, 141);vertical-align: middle;">corresponding</label>
+  </td></tr>
+  <tr><td> 
+    <input type="checkbox" id="co-first${idx}" style="width:auto !important;vertical-align: middle;">
+    <label for="co-first${idx}" style="color:rgb(119, 66, 141);vertical-align: middle;">co-first</label>
+  </td></tr>
+  </tbody>
+  </table>
+  </div>
   </div>`;
 }
 /*
 <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
         id="note${idx}-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
         autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both" placeholder="note #${idx + 1}">
+        
+  // <div style="display:inline-block;width:calc(100% - 510px);padding:10px">
+  //   <input id="note${idx}-input" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
+  //     autocapitalize="off" maxlength="2048" tabindex="1">
+  //   </div>
 */
 
 let resultItem = {
   element: (item, data) => {
-    console.log(data);
+    // console.log(data);
     item.style = "display: flex; justify-content: space-between;";
     let sup = data.value.id ? `<sup style="color: rgba(0,0,0,.2)">${data.value.id}</sup>` : "";
     item.innerHTML = `
@@ -109,6 +125,86 @@ function set_selection_pub(item) {
   }
 }
 
+let selected_paper;
+function set_selection_paper(item) {
+  if (item) {
+    $.ajax({
+      type: "POST",
+      url: host_url + "/getpaper",
+      data: { id: item.id },
+      success: function (data) {
+        console.log(data);
+        load_paper_data(JSON.stringify(data));
+      }
+    });
+    selected_paper = item.id;
+    $('#save-btn').css('visibility', 'visible');
+  } else {
+    selected_paper = undefined;
+    $('#save-btn').css('visibility', 'hidden');
+  }
+}
+
+const title_input_ac = new autoComplete({
+  selector: "#title-input",
+  data: {
+    src: indexfiles['papers'],
+    keys: ["id", "title"],
+    cache: true,
+  },
+  placeHolder: "title",
+  resultsList: resultsList,
+  resultItem: resultItem,
+  searchEngine: "strict",
+  events: {
+    input: {
+      focus() {
+        if (title_input_ac.input.value.length) {
+          title_input_ac.start();
+        }
+      },
+      input() {
+        set_selection_paper(undefined);
+        if (title_input_ac.input.value.length) {
+          title_input_ac.start();
+        }
+      },
+      selection(event) {
+        set_selection_paper(event.detail.selection.value);
+      },
+    },
+  },
+}), chinese_title_input_ac = new autoComplete({
+  selector: "#cn-title-input",
+  data: {
+    src: indexfiles['papers'],
+    keys: ["id", "chinese title"],
+    cache: true,
+  },
+  placeHolder: "CN title",
+  resultsList: resultsList,
+  resultItem: resultItem,
+  searchEngine: "strict",
+  events: {
+    input: {
+      focus() {
+        if (chinese_title_input_ac.input.value.length) {
+          chinese_title_input_ac.start();
+        }
+      },
+      input() {
+        if (chinese_title_input_ac.input.value.length) {
+          chinese_title_input_ac.start();
+        }
+      },
+      selection(event) {
+        set_selection_paper(event.detail.selection.value);
+      },
+    },
+  },
+});
+
+
 const pubInput = new autoComplete({
   selector: "#pub-input",
   data: {
@@ -136,7 +232,7 @@ const pubInput = new autoComplete({
       },
       focusout() {
         console.log('focusout');
-        if (selected_pub == undefined) {
+        if (selected_pub == undefined && pubInput.input.value.length) {
           pubInput.input.style.color = 'red';
         }
       },
@@ -148,12 +244,13 @@ const pubInput = new autoComplete({
 });
 
 let auth_cnt = 0;
-let person_ac = new Array(0), person_note_ac = new Array(0);
+let person_ac = new Array(0);
 let selected_auth = {};
 function set_selection_people(i, which, item) {
   if (item) {
     // console.log(which, item);
-    document.getElementById(`auth${i}-input`).value = item[which];
+    // document.getElementById(`auth${i}-input`).value = item[which];
+    document.getElementById(`auth${i}-input`).value = item.en + ' ' + item.cn;
     if (document.getElementById(`raw${i}-input`).value === '')
       document.getElementById(`raw${i}-input`).value = item[which];
     // document.getElementById(`note${i}-input`).value = cn;
@@ -191,54 +288,13 @@ function init_person_input(i) {
         },
         focusout() {
           console.log('focusout');
-          if (!(i in selected_auth) || selected_auth[i] == undefined) {
+          if ((!(i in selected_auth) || selected_auth[i] == undefined) && person_ac[i].input.value.length) {
             person_ac[i].input.style.color = 'red';
           }
         },
         selection(event) {
           const feedback = event.detail;
           set_selection_people(i, feedback.selection.key, feedback.selection.value);
-        },
-      },
-    },
-  });
-
-  person_note_ac[i] = new autoComplete({
-    selector: `#note${i}-input`,
-    data: {
-      src: [{
-        "note": "corresponding"
-      }],
-      keys: ["note"],
-    },
-    placeHolder: `note #${i + 1}`,
-    resultsList: resultsList,
-    resultItem: resultItem,
-    searchEngine: "strict",
-
-    events: {
-      input: {
-        focus() {
-          person_note_ac[i].input.style.color = '#7b7b7b';
-          if (person_note_ac[i].input.value.length) {
-            person_note_ac[i].start();
-          }
-        },
-        input() {
-          // set_selection_note(i);
-          if (person_note_ac[i].input.value.length) {
-            person_note_ac[i].start();
-          }
-        },
-        focusout() {
-          console.log('focusout');
-          if (!(i in selected_auth) || selected_auth[i] == undefined) {
-            person_note_ac[i].input.style.color = 'red';
-          }
-        },
-        selection(event) {
-          const feedback = event.detail;
-          set_selection_note(i, feedback.selection.value);
         },
       },
     },
@@ -252,7 +308,6 @@ function add_people() {
   x.innerHTML = `<td>${table_entry(auth_cnt)}</td>`;
   document.getElementById("authors-table").appendChild(x);
   person_ac.push(null);
-  person_note_ac.push(null);
   init_person_input(auth_cnt);
   auth_cnt++;
 }
@@ -307,7 +362,7 @@ function init_funding_input(i) {
         },
         focusout() {
           console.log('focusout');
-          if (!(i in selected_funding) || selected_funding[i] == undefined) {
+          if ((!(i in selected_funding) || selected_funding[i] == undefined) && funding_ac[i].input.value.length) {
             funding_ac[i].input.style.color = 'red';
           }
         },
@@ -379,7 +434,7 @@ function add_funding() {
   funding_cnt += 1;
 }
 
-for (let i = 0; i < 5; ++i) {
+for (let i = 0; i < 0; ++i) {
   add_people();
   add_funding();
 }
@@ -416,7 +471,8 @@ function gather_paper_info() {
         "id": selected_auth[i].id,
         "name": selected_auth[i].name,
         "raw": document.getElementById(`raw${i}-input`).value,
-        "note": document.getElementById(`note${i}-input`).value
+        "corresp": document.getElementById(`corresp${i}`).checked,
+        "co-first": document.getElementById(`co-first${i}`).checked,
       });
     }
   }
@@ -427,7 +483,7 @@ function gather_paper_info() {
     if (i in selected_funding && selected_funding[i] != undefined) {
       fundings.push({
         "name": selected_funding[i][0],
-        "grant": selected_funding[i].length > 1 ? selected_funding[i][1] : undefined
+        "grant": selected_funding[i].length > 1 ? selected_funding[i][1] : ""
       });
     }
   }
@@ -461,6 +517,8 @@ function submit_paper() {
     success: function (data) {
       console.log(data);
       // reload_ac();
+      localStorage.removeItem("paper-info");
+      location.reload();
     }
   });
 }
@@ -557,13 +615,31 @@ function load_paper_data(data) {
   $('#title-input').val(data.title);
   $('#cn-title-input').val(data["CN title"]);
   $('#raw-pub-input').val(data["raw-pub"]);
+  $('#authors-table').html("");
+  $('#fundings-table').html("");
+  auth_cnt = 0;
+  funding_cnt = 0;
+
   set_selection_pub(data.pub);
   for (let i = 0; i < data.authors.length; ++i) {
     if (i == auth_cnt) add_people();
-    $(`#auth${i}-input`).val(data.authors[i].name);
+    $(`#auth${i}-input`).val(data.authors[i].id);
     $(`#raw${i}-input`).val(data.authors[i].raw);
-    $(`#note${i}-input`).val(data.authors[i].note);
-    set_selection_people(i, 'name', { id: data.authors[i].id, name: data.authors[i].name });
+    // $(`#note${i}-input`).val(data.authors[i].note);
+    if (data.authors[i].corresp) {
+      document.getElementById(`corresp${i}`).checked = true;
+    }
+    if (data.authors[i]["co-first"]) {
+      document.getElementById(`co-first${i}`).checked = true;
+    }
+    let author_entry;
+    for (let a of indexfiles['people']) {
+      if (a.id == data.authors[i].id) {
+        author_entry = a;
+        break;
+      }
+    }
+    set_selection_people(i, 'en', author_entry);
   }
   for (let i = 0; i < data.fundings.length; ++i) {
     if (i == funding_cnt) add_funding();
@@ -668,4 +744,21 @@ for (let elem of ['#submtime-input', '#actime-input', '#pubtime-input']) {
   });
 }
 
-
+function save_paper() {
+  let data = gather_paper_info();
+  console.log(data);
+  $.ajax({
+    type: "POST",
+    url: host_url + "/updatepaper",
+    data: {
+      id: selected_paper,
+      data: JSON.stringify(data)
+    },
+    success: function (data) {
+      console.log(data);
+      // reload_ac();
+      localStorage.removeItem("paper-info");
+      location.reload();
+    }
+  });
+}
