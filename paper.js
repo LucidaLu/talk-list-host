@@ -2,7 +2,7 @@
 
 // let host_url = 'http://10.206.32.47:5739';
 let host_url = 'http://10.206.32.47:5739';
-//'http://127.0.0.1:5739';
+// let host_url = 'http://127.0.0.1:5739';
 
 function table_entry(idx) {
   return `<div style="display:inline-block;width:calc(50% - 80px);padding:10px">
@@ -462,7 +462,6 @@ function switch_to(x) {
 setTimeout(() => {
   $('#paper-info-entry').css('display', 'block');
 }, 100);
-// switch_to(0);
 
 function gather_paper_info() {
   let authors = [];
@@ -613,6 +612,7 @@ function submit_funding() {
 function load_paper_data(data) {
   data = JSON.parse(data);
   console.log(data);
+  if (data == null) return;
   $('#title-input').val(data.title);
   $('#cn-title-input').val(data["CN title"]);
   $('#raw-pub-input').val(data["raw-pub"]);
@@ -667,8 +667,6 @@ function load_paper_data(data) {
 function save_draft() {
   localStorage.setItem("paper-info", JSON.stringify(gather_paper_info()));
 }
-
-load_paper_data(localStorage.getItem("paper-info"));
 
 
 function strftime(sFormat, date) {
@@ -770,3 +768,25 @@ function clear_all() {
   localStorage.removeItem("paper-info");
   location.reload();
 }
+
+function submit_pub() {
+  let data = {
+    "name": document.getElementById("publication-name-input").value,
+    "alias": document.getElementById("publication-alias-input").value,
+    "journal": document.getElementById("journal").checked,
+  };
+
+  $.ajax({
+    type: "POST",
+    url: host_url + "/addpub",
+    data: data,
+    success: function (data) {
+      console.log(data);
+      reload_ac();
+    }
+  });
+}
+
+load_paper_data(localStorage.getItem("paper-info"));
+
+// switch_to(0);

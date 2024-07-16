@@ -154,6 +154,61 @@
         <div
           style="display:inline-block; border:2px solid;border-color: rgb(241, 243, 244); width: 100%;padding: 10px;">
           <div style="display:block;padding-bottom: 20px;">
+            <div class="data-label">new publication</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="data-label">publication</div>
+            <div class="fill-remain-width" style="width: calc(100% - 110px);">
+              <div class=" autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                  id="publication-name-input" type="text" dir="ltr" spellcheck="false" autocorrect="off"
+                  autocomplete="off" autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%"
+                  aria-autocomplete="both" placeholder="publication name">
+              </div>
+            </div>
+            <div style="padding: 10px;"></div>
+            <div class="fill-remain-width" style="width: calc(100% - 110px);text-align: left;vertical-align: middle;">
+              <div style="display: flex;
+              align-items: center;
+              justify-content: center;">
+                <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"
+                  style="width:50% !important;display:inline-block"><input id="publication-alias-input" type="text"
+                    dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"
+                    maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both" placeholder="alias">
+                </div>
+                <span style="padding: 5px;"></span>
+                <div style="display:inline-block;width:50% !important">
+                  <div>
+                    <input type="radio" style="width:auto !important" id="journal" name="drone" value="journal"
+                      checked />
+                    <label for="journal">journal</label>
+                  </div>
+                  <div>
+                    <input type="radio" style="width:auto !important" id="conference" name="drone" value="conference" />
+                    <label for="conference">conference</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div style="padding: 10px;"></div>
+            <div class="data-label">grant no.</div>
+            <div class="fill-remain-width" style="width: calc(100% - 110px);">
+              <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                  id="fund-grant-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                  autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                  placeholder="grant no.">
+              </div>
+            </div> -->
+          </div>
+
+          <div style="text-align: center;padding-top: 20px;">
+            <a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple my-button" onclick="submit_pub()">submit</a>
+          </div>
+        </div>
+
+        <div style="padding:30px;"></div>
+        <div
+          style="display:inline-block; border:2px solid;border-color: rgb(241, 243, 244); width: 100%;padding: 10px;">
+          <div style="display:block;padding-bottom: 20px;">
             <div class="data-label">new author</div>
           </div>
           <div class="data-label">en name</div>
