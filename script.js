@@ -256,6 +256,7 @@ function init() {
   }
 
   server_addr = server_list[1];
+  fetch_data(scroll_to_lastest);
   // $.ajax({
   //   url: server_addr + '/fetch',
   //   type: 'POST',
@@ -280,7 +281,7 @@ init();
 let cherry = undefined;
 // check if there is #markdown-container
 if (is_mail_page) {
-  console.error('No #markdown-container found');
+  console.log('No #markdown-container found');
 } else {
   cherry = new Cherry({
     id: 'markdown-container',
@@ -445,8 +446,6 @@ function download(type) {
     });
   }
 }
-
-const Cite = require('citation-js');
 
 function month_day(date_string) {
   let dao = new Date(date_string);
