@@ -4,7 +4,7 @@ let talk_info = {}, all_data, global_data, reports_data, prd_data, current_selec
 
 let server_list = [
   // 'http://127.0.0.1:9202',
-  'http://10.206.32.47:9202', 'http://82.156.12.45:9202'], server_addr;
+  'https://10.206.32.47:9202', 'https://82.156.12.45:9210'], server_addr;
 
 let fetch_interval_id;
 
