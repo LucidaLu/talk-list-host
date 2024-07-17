@@ -255,25 +255,25 @@ function init() {
     }
   }
 
-  server_addr = server_list[0];
-  $.ajax({
-    url: server_addr + '/fetch',
-    type: 'POST',
-    success: (data) => {
-      console.log('in ICT');
-      load_data(data);
-      scroll_to_lastest();
-      // fetch_interval_id = setInterval(fetch_data, 5000);
-    },
-    error: (data) => {
-      console.log('out of ICT');
-      server_addr = server_list[1];
-      fetch_data(scroll_to_lastest);
-      // fetch_interval_id = setInterval(fetch_data, 5000);
-    },
-    timeout: 1000,
-    data: {},
-  });
+  server_addr = server_list[1];
+  // $.ajax({
+  //   url: server_addr + '/fetch',
+  //   type: 'POST',
+  //   success: (data) => {
+  //     console.log('in ICT');
+  //     load_data(data);
+  //     scroll_to_lastest();
+  //     // fetch_interval_id = setInterval(fetch_data, 5000);
+  //   },
+  //   error: (data) => {
+  //     console.log('out of ICT');
+  //     server_addr = server_list[1];
+  //     fetch_data(scroll_to_lastest);
+  //     // fetch_interval_id = setInterval(fetch_data, 5000);
+  //   },
+  //   timeout: 1000,
+  //   data: {},
+  // });
 }
 
 init();
