@@ -480,7 +480,7 @@ function gather_paper_info() {
   }
 
   let fundings = [];
-  console.log(selected_funding);
+  // console.log(selected_funding);
   for (let i = 0; i < funding_cnt; ++i) {
     if (i in selected_funding && selected_funding[i] != undefined) {
       fundings.push({
@@ -489,7 +489,7 @@ function gather_paper_info() {
       });
     }
   }
-  console.log(selected_pub);
+  // console.log(selected_pub);
 
   return {
     "title": document.getElementById("title-input").value,
@@ -506,6 +506,7 @@ function gather_paper_info() {
     "issue": document.getElementById("issue-input").value,
     "page-start": document.getElementById("page-start").value,
     "page-end": document.getElementById("page-end").value,
+    "status": document.getElementById("status-input").checked ? "ac" : "sub",
   };
 }
 
@@ -664,12 +665,18 @@ function load_paper_data(data) {
   $('#issue-input').val(data.issue);
   $('#page-start').val(data["page-start"]);
   $('#page-end').val(data["page-end"]);
+  if ((data.status == "ac") != (document.getElementById("status-input").checked)) {
+    document.getElementById("status-input").click();
+  }
 }
 
 function save_draft() {
   localStorage.setItem("paper-info", JSON.stringify(gather_paper_info()));
 }
 
+setInterval(() => {
+  save_draft();
+}, 1000);
 
 function strftime(sFormat, date) {
   if (!(date instanceof Date)) date = new Date();
@@ -789,6 +796,19 @@ function submit_pub() {
   });
 }
 
+$("#status-input").on("click", function () {
+  console.log(this.checked);
+  $("#status-label").css("opacity", 0);
+  setTimeout(() => {
+    if (this.checked) {
+      $("#status-label").html(`<span style="color:rgb(119, 66, 141)">Accepted<span>`);
+    } else {
+      $("#status-label").html("In submission");
+    }
+    $("#status-label").css("opacity", 1);
+  }, 100);
+}
+);
 load_paper_data(localStorage.getItem("paper-info"));
 
 // switch_to(0);

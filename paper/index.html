@@ -108,6 +108,23 @@
     #author-funding-entry {
       min-height: 85vh;
     }
+
+    .t-cb {
+      transition: all 0.3s cubic-bezier(0.33, 1, 0.66, 1);
+    }
+
+    .checkbox:checked+.checkbox-wrapper {
+      background-color: rgb(119, 66, 141) !important;
+    }
+
+    .checkbox:checked+.checkbox-wrapper .checkbox-toggle {
+      left: 2rem;
+      background-color: #ccc;
+    }
+
+    #status-label {
+      transition: opacity 100ms;
+    }
   </style>
 </head>
 
@@ -276,6 +293,36 @@
           <div class="fill-remain-width"><input id="cn-title-input" type="text" dir="ltr" spellcheck=false
               autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="2048" tabindex="1"></div>
         </div>
+
+        <div class="input-wrapper">
+          <div class="data-label">status</div>
+          <!--
+          <div class="fill-remain-width">
+              
+              <div class="autoComplete_wrapper" role="combobox" aria-haspopup="true" aria-expanded="false"><input
+                id="cn-title-input" type="text" dir="ltr" spellcheck="false" autocorrect="off" autocomplete="off"
+                autocapitalize="off" maxlength="2048" tabindex="1" style="width:100%" aria-autocomplete="both"
+                placeholder="CN title">
+          </div>
+            </div> -->
+          <div class="fill-remain-width">
+            <div>
+              <div class="relative dib">
+                <input class="absolute z-5 w-100 h-100 o-0 pointer checkbox" id="status-input" type="checkbox" />
+                <div class="relative z-4 dib w3 h2 overflow-hidden br3 v-mid bg-animate checkbox-wrapper"
+                  style="background-color: #f1f3f4;">
+                  <div class="absolute right-auto left-0 w2 h2 br3 bg-silver shadow-4 t-cb bg-animate checkbox-toggle">
+                  </div>
+                </div>
+              </div>
+              <div class="dib mr2 silver" id="status-label" style="padding-left:5px;">
+                In submission
+              </div>
+            </div>
+          </div>
+        </div>
+
+
 
         <div class="input-wrapper">
           <div class="data-label">publ</div>
