@@ -134,6 +134,7 @@ function loadDB(arrayBuffer) {
     }
     tables.free();
 
+    firstTableName = 'paper';
     //Select first table and show It
     tableList.val(firstTableName);
     doDefaultSelect(firstTableName);
@@ -141,10 +142,12 @@ function loadDB(arrayBuffer) {
     $("#output-box").fadeIn();
     $(".nouploadinfo").hide();
     $("#sample-db-link").hide();
-    $("#dropzone").delay(50).animate({ height: 75 }, 500);
+    $('#dropzone').hide();
+    // $("#dropzone").delay(50).animate({ height: 75 }, 500);
     $("#success-box").show();
 
     setIsLoading(false);
+
   });
 }
 
