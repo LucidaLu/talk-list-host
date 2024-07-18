@@ -80,6 +80,7 @@ function initialize() {
     }
   };
   const loadUrlDB = 'https://82.156.12.45:9203/database';//$.urlParam("url");
+  // const loadUrlDB = '/whole.db';
   if (loadUrlDB != null) {
     setIsLoading(true);
     const xhr = new XMLHttpRequest();
@@ -148,6 +149,9 @@ function loadDB(arrayBuffer) {
 
     setIsLoading(false);
 
+    $("#useful-snippets").show();
+
+    $("#snippets-selection-0").click();
   });
 }
 
@@ -552,3 +556,37 @@ function exportQueryTableToCsv() {
 
   setIsLoading(false);
 }
+
+
+let s = '';
+
+let snippets = [
+  ["投稿中文章", "SELECT * FROM 'paper' WHERE status = 'sub'"],
+];
+
+for (let i = 0; i < 10; ++i) {
+  snippets.push([`${2024 - i}论文`, `SELECT * FROM 'paper' WHERE pub_time between '${2024 - i}-01-01' and '${2024 - i}-12-31'`])
+}
+
+for (let i in snippets) {
+  s += `<td style="padding: 10px;">
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="snippets-selection" id="snippets-selection-${i}"
+      value="option${i}">
+    <label class="form-check-label" for="snippets-selection-${i}">
+      ${snippets[i][0]}
+    </label>
+  </div>
+  </td>`
+}
+
+$('#snippets-list').html(s);
+
+for (let i in snippets) {
+  $("#snippets-selection-" + i).on("click", function () {
+    console.log(i);
+    editor.setValue(snippets[i][1], -1);
+    $("#sql-run").click();
+  });
+}
+
