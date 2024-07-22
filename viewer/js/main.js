@@ -140,6 +140,15 @@ function loadDB(arrayBuffer) {
     tableList.val(firstTableName);
     doDefaultSelect(firstTableName);
 
+    let select_ = `create view paper_export as
+    select t1.id, t1.title || t1.chinese_title as title, t1.author, all_pub.name, t1.sub_time as submitted, t1.ac_time as acccepted, t1.pub_time as published, t1.vol as volume, t1.issue as issue, t1.page_start || '-' || t1.page_end as page, t1.status as status from (SELECT paper.*, group_concat(raw, ', ')as author FROM paper inner join paper_author on paper.id==paper_author.paper_id GROUP BY paper.id) as t1 inner join all_pub on t1.pub_id=all_pub.id;`;
+    editor.setValue(select_, -1);
+    renderQuery(select_);
+
+    select_ = `select * from paper_export;`;
+    editor.setValue(select_, -1);
+    renderQuery(select_);
+
     $("#output-box").fadeIn();
     $(".nouploadinfo").hide();
     $("#sample-db-link").hide();
@@ -561,11 +570,11 @@ function exportQueryTableToCsv() {
 let s = '';
 
 let snippets = [
-  ["投稿中文章", "SELECT * FROM 'paper' WHERE status = 'sub'"],
+  ["投稿中文章", "SELECT id, title, author, name, submitted, acccepted as notification FROM 'paper_export' WHERE status = 'sub'"],
 ];
 
 for (let i = 0; i < 10; ++i) {
-  snippets.push([`${2024 - i}论文`, `SELECT * FROM 'paper' WHERE pub_time between '${2024 - i}-01-01' and '${2024 - i}-12-31'`])
+  snippets.push([`${2024 - i}论文`, `SELECT id, title, author, name, submitted, acccepted, published, volume, issue, page FROM 'paper_export' WHERE published between '${2024 - i}-01-01' and '${2024 - i}-12-31'`])
 }
 
 for (let i in snippets) {
