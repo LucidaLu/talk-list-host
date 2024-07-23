@@ -517,7 +517,7 @@ function generate_mail() {
   }
 
   if (document.getElementById('report-check').checked) {
-    if (len(active_report) == 0) {
+    if (active_report.length == 0) {
       alert('请至少选择一个组会报告，如果这周没有，也选一个，然后把勾去掉，因为要根据当前的时间计算后面五周的预告');
       return;
     }
