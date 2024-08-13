@@ -16,7 +16,7 @@ function push_data() {
     data: JSON.stringify(all_data),
     success: function (data) {
       console.log(data);
-      fetch_data();
+      // fetch_data();
     },
     error: function (data) {
       console.log(data);
