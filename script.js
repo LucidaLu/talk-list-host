@@ -149,7 +149,7 @@ const hot = new Handsontable(document.querySelector('#list'), {
   data: [talk_list_header],
   minCols: talk_list_header.length,
   rowHeaders: true,
-  colWidths: [50, 50, 100, 50, 50, 100, 200, 100],
+  colWidths: [50, 50, 100, 50, 200, 100, 200, 100],
   width: $('#list-wrapper').width() / 2,
   height: window.innerHeight * (is_mail_page ? 0.4 : 0.3),
   // colHeaders: true,
