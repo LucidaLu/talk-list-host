@@ -1,3 +1,38 @@
+function fallbackCopyTextToClipboard(text) {
+  var textArea = document.createElement("textarea");
+  textArea.value = text;
+
+  // Avoid scrolling to bottom
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    var successful = document.execCommand('copy');
+    var msg = successful ? 'successful' : 'unsuccessful';
+    console.log('Fallback: Copying text command was ' + msg);
+  } catch (err) {
+    console.error('Fallback: Oops, unable to copy', err);
+  }
+
+  document.body.removeChild(textArea);
+}
+function copyTextToClipboard(text) {
+  if (!navigator.clipboard) {
+    fallbackCopyTextToClipboard(text);
+    return;
+  }
+  navigator.clipboard.writeText(text).then(function () {
+    console.log('Async: Copying to clipboard was successful!');
+  }, function (err) {
+    console.error('Async: Could not copy text: ', err);
+  });
+}
+
 let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation', 'wechat-link'];
 
 let talk_info = {}, all_data, global_data, reports_data, prd_data, current_selection = undefined;
@@ -9,7 +44,12 @@ let server_list = [
 let fetch_interval_id;
 
 let is_mail_page = document.getElementById('markdown-container') === null;
+let push_lock = 0;
 function push_data() {
+  // set cursor
+
+  document.body.style.cursor = 'wait';
+  push_lock++;
   $.ajax({
     url: server_addr + '/push',
     type: 'POST',
@@ -17,6 +57,9 @@ function push_data() {
     success: function (data) {
       console.log(data);
       // fetch_data();
+      push_lock--;
+      if (push_lock == 0 && fetch_lock == 0)
+        document.body.style.cursor = 'default';
     },
     error: function (data) {
       console.log(data);
@@ -25,14 +68,16 @@ function push_data() {
 }
 
 function update_abs_and_bio() {
-  let s = cherry.getValue();
-  let arr = s.split('===');
-  console.log(arr[0]);
-  global_data[current_selection]["title"] = arr[0].substring(1).trim();
-  global_data[current_selection]["abstract"] = arr[1].trim();
-  global_data[current_selection]["bio"] = arr[2].trim();
-  console.log(global_data[current_selection]);
-  push_data();
+  if (!cherry_lock) {
+    let s = cherry.getValue();
+    let arr = s.split('===');
+    console.log(arr[0]);
+    global_data[current_selection]["title"] = arr[0].substring(1).trim();
+    global_data[current_selection]["abstract"] = arr[1].trim();
+    global_data[current_selection]["bio"] = arr[2].trim();
+    console.log(global_data[current_selection]);
+    push_data();
+  }
 }
 
 let mon_tab_changes = false;
@@ -75,12 +120,18 @@ function load_data(data) {
   mon_tab_changes = true;
 }
 
+let fetch_lock = 0;
 function fetch_data(callback) {
+  document.body.style.cursor = 'wait';
+  fetch_lock++;
   $.ajax({
     url: server_addr + '/fetch',
     type: 'POST',
     success: (data) => {
       load_data(data);
+      fetch_lock--;
+      if (fetch_lock == 0 && push_lock == 0)
+        document.body.style.cursor = 'default';
       if (callback) callback();
     },
     error: (request, status, error) => {
@@ -112,20 +163,26 @@ const hot = new Handsontable(document.querySelector('#list'), {
         current_selection = i;
         let s = `# ${global_data[i]["title"]}\n\n===\n\n`;
         s += global_data[i]["abstract"] + '\n\n===\n\n' + global_data[i]["bio"];
-        if (cherry)
+        if (cherry) {
+          cherry_lock = true;
           cherry.setValue(s);
+          cherry_lock = false;
+        }
 
         $('#profile-pic').attr("src", global_data[i]["pic-prev"]);
       } else {
         current_selection = undefined;
-        if (cherry)
+        if (cherry) {
+          cherry_lock = true;
           cherry.setValue("");
+          cherry_lock = false;
+        }
       }
     }
 
 
 
-    push_data();
+    // push_data();
 
     $('#img-sec').css("visibility", "visible");
     $('#info-sec').css("visibility", "visible");
@@ -397,9 +454,15 @@ function start_generate(type) {
         bio_mode: $('input[name="inlineRadioOptions"]:checked').val()
       },
       success: function (data) {
+        console.log(data);
+        localStorage.setItem('__editor_content', data['txt'])
+        localStorage.setItem('title', data['header'])
+        localStorage.setItem('desc', data['info'])
+
+        window.open('/md');
         if (data === "started") {
           alert("generating started");
-        } else {
+        } else if (data == "working") {
           alert("already generating");
         }
       },
@@ -450,6 +513,10 @@ function download(type) {
 function month_day(date_string) {
   let dao = new Date(date_string);
   return `${dao.getMonth() + 1}月${dao.getDate()}日`;
+}
+
+function copy(which) {
+  copyTextToClipboard(localStorage.getItem(which));
 }
 
 function generate_mail() {

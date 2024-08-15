@@ -157,12 +157,20 @@
                   </td>
                   <td>
                     <button class="btn btn-sm btn-outline-secondary"
-                      onclick="start_generate('wechat')">generate</button>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="get_stat('wechat')">status</button>
+                      onclick="start_generate('markdown')">generate</button>
                   </td>
                 </tr>
+                <tr>
+                  <td>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copy('title')">copy title</button>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copy('desc')">copy desc</button>
+                  </td>
+                </tr>
+
                 <tr>
                   <td>
                     poster
@@ -254,6 +262,10 @@
   <link rel="stylesheet" href="assets/handsontable.full.min.css" />
   <script src="assets/cherry/cherry-markdown.js"></script>
   <script src="script.js"></script>
+
+  <script src="/assets/popper.min.js"></script>
+  <script src="/assets/bootstrap.min.js"></script>
+
 </body>
 
 
