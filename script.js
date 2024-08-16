@@ -576,7 +576,7 @@ function generate_mail() {
 <p ${P_STYLE}><strong>题　目：</strong><a href="${data['wechat-link']}">${data['title']}</a></p>
 <p ${P_STYLE}><strong>讲　者：</strong>${data['presenter']}，${data['affiliation']}</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
-<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/n6CjOLd30Mjl">605-5793-9921</a></p>
+<p ${P_STYLE}><strong>地　点：</strong>${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/n6CjOLd30Mjl">605-5793-9921</a></p>
 
 <p>&nbsp;</p>
 `;
