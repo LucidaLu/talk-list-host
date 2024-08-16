@@ -151,7 +151,7 @@ const hot = new Handsontable(document.querySelector('#list'), {
   rowHeaders: true,
   colWidths: [50, 50, 100, 50, 200, 100, 200, 100],
   width: $('#list-wrapper').width() / 2,
-  height: window.innerHeight * (is_mail_page ? 0.4 : 0.3),
+  height: is_mail_page ? window.innerHeight * 0.4 : 320,
   // colHeaders: true,
   licenseKey: 'non-commercial-and-evaluation',
   afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
