@@ -562,7 +562,7 @@ function generate_mail() {
       s += `<p ${P_STYLE}><strong>内　容：paper reading</strong>（${data['student']}）</p>
 <p ${P_STYLE}><strong>论　文：</strong>${cite_obj.get()[0]['title']}<sup>${sym}</sup>（见附件）</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
-<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/vgWvFfibhmRA">612-2691-6328</a></p>
+<p ${P_STYLE}><strong>地　点：</strong>${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/vgWvFfibhmRA">612-2691-6328</a></p>
 
 <p>&nbsp;</p>
 `
@@ -592,7 +592,7 @@ function generate_mail() {
       let data = reports_data[i - 1];
       s += `<p ${P_STYLE}><strong>内　容：组会</strong>（${data['student']}半小时报告 + 每人5分钟报告）</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`, 2)}</p>
-<p ${P_STYLE}><strong>地　点：</strong>会议室${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/NHZnA7sCte1P">722-5788-8455</a></p>
+<p ${P_STYLE}><strong>地　点：</strong>${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/NHZnA7sCte1P">722-5788-8455</a></p>
 
 <p>&nbsp;</p>
 `;
