@@ -707,12 +707,22 @@ function download_attach() {
   }
 }
 
+function slugify(str) {
+  str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
+  str = str.toLowerCase(); // convert string to lowercase
+  str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
+    .replace(/\s+/g, '-') // replace spaces with hyphens
+    .replace(/-+/g, '-'); // remove consecutive hyphens
+  return str;
+}
+
+
 $('#attach-file').change(function () {
   var f = this.files[0];
   var formData = new FormData();
   let cite_obj = new Cite(prd_data[active_prd[0] - 1]['doi']);
   let datestr = prd_data[active_prd[0] - 1]['date'].slice(5);
-  let newf = new File([f], `【${datestr} ${prd_data[active_prd[0] - 1]['student']}】${cite_obj.get()[0].title}.pdf`, { type: f.type });
+  let newf = new File([f], `【${datestr} ${prd_data[active_prd[0] - 1]['student']}】${slugify(cite_obj.get()[0].title)}.pdf`, { type: f.type });
   formData.append('file', newf);
   console.log(formData);
   document.getElementById("attach-file").disabled = true;
