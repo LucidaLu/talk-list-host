@@ -38,8 +38,8 @@ let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affi
 let talk_info = {}, all_data, global_data, reports_data, prd_data, current_selection = undefined;
 
 let server_list = [
-  // 'http://127.0.0.1:9202',
-  'https://10.206.32.47:9202', 'https://82.156.12.45:9210'], server_addr;
+  'https://quact-server.yiren.lu',
+];
 
 let fetch_interval_id;
 
@@ -312,7 +312,7 @@ function init() {
     }
   }
 
-  server_addr = server_list[1];
+  server_addr = server_list[0];
   fetch_data(scroll_to_lastest);
   // $.ajax({
   //   url: server_addr + '/fetch',
