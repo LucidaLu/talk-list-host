@@ -33,7 +33,7 @@ function copyTextToClipboard(text) {
   });
 }
 
-let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation', 'wechat-link'];
+let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation', 'summarizer', 'wechat-link'];
 
 let talk_info = {}, all_data, global_data, reports_data, prd_data, current_selection = undefined;
 
@@ -89,6 +89,10 @@ function load_data(data) {
   for (let i in global_data) {
     for (let j in talk_list_header) {
       let x = parseInt(i) + 1, y = parseInt(j);
+      if (global_data[i][talk_list_header[j]] === undefined) {
+        global_data[i][talk_list_header[j]] = "";
+      }
+
       if (hot.getDataAtCell(x, y) !== global_data[i][talk_list_header[j]]) {
         hot.setDataAtCell(x, y, global_data[i][talk_list_header[j]]);
       }
@@ -149,7 +153,7 @@ const hot = new Handsontable(document.querySelector('#list'), {
   data: [talk_list_header],
   minCols: talk_list_header.length,
   rowHeaders: true,
-  colWidths: [50, 50, 100, 50, 200, 100, 200, 100],
+  colWidths: [50, 50, 100, 50, 200, 60, 150, 60, 200],
   width: $('#list-wrapper').width() / 2,
   height: is_mail_page ? window.innerHeight * 0.4 : 320,
   // colHeaders: true,
@@ -577,7 +581,7 @@ function generate_mail() {
 <p ${P_STYLE}><strong>讲　者：</strong>${data['presenter']}，${data['affiliation']}</p>
 <p ${P_STYLE}><strong>时　间：</strong>${fmt_date(`${data['date']} ${data['time']}`)}</p>
 <p ${P_STYLE}><strong>地　点：</strong>${data['room']} + 腾讯会议<a href="https://meeting.tencent.com/dm/n6CjOLd30Mjl">605-5793-9921</a></p>
-
+<p ${P_STYLE}><strong>总结者：</strong>${data['summarizer']}</p>
 <p>&nbsp;</p>
 `;
     }
@@ -609,11 +613,12 @@ function generate_mail() {
 
   let table = '';
   for (let i = 0; i < 5; ++i) {
-    table += `<tr><td ${TD_STYLE}>${month_day(prd_data[nxt_prd - 1 + i]['date'])}</td><td ${TD_STYLE}>${reports_data[nxt_report - 1 + i]['student']}</td><td ${TD_STYLE}>${prd_data[nxt_prd - 1 + i]['student']}</td></tr>`;
+    table += `<tr><td ${TD_STYLE}>${reports_data[nxt_report - 1 + i]['student']}（${new Date(reports_data[nxt_report - 1 + i]['date']).getMonth() + 1}月${new Date(reports_data[nxt_report - 1 + i]['date']).getDate()}日）</td><td ${TD_STYLE}>${prd_data[nxt_prd - 1 + i]['student']}（${new Date(prd_data[nxt_prd - 1 + i]['date']).getMonth() + 1}月${new Date(prd_data[nxt_prd - 1 + i]['date']).getDate()}日）</td></tr>`;
   }
 
   s += `<p ${P_STYLE}><strong style="line-height: 2">接下来几周组会及paper reading安排暂定如下：</strong></p>`;
-  s += `<table style="border-collapse: collapse;border-spacing: 0;empty-cells: show;border: 1px solid #cbcbcb;"><thead style="background-color: #e0e0e0;color: #000;text-align: left;vertical-align: bottom;"><tr><th ${TH_STYLE}>时间</th><th ${TH_STYLE}>半小时报告</th><th ${TH_STYLE}>paper reading</td></tr></thead><tbody>${table}</tbody></table>`;
+  // s += `<table style="border-collapse: collapse;border-spacing: 0;empty-cells: show;border: 1px solid #cbcbcb;"><thead style="background-color: #e0e0e0;color: #000;text-align: left;vertical-align: bottom;"><tr><th ${TH_STYLE}>时间</th><th ${TH_STYLE}>半小时报告</th><th ${TH_STYLE}>paper reading</td></tr></thead><tbody>${table}</tbody></table>`;
+  s += `<table style="border-collapse: collapse;border-spacing: 0;empty-cells: show;border: 1px solid #cbcbcb;"><thead style="background-color: #e0e0e0;color: #000;text-align: left;vertical-align: bottom;"><tr><th ${TH_STYLE}>半小时报告</th><th ${TH_STYLE}>paper reading</td></tr></thead><tbody>${table}</tbody></table>`;
   s += `<p>&nbsp;</p>`;
 
   s += `<p ${P_STYLE}>另外，<span style="color:red">请大家及时将周报提交给对应老师，并在本周周报进行更新。</span></p>`;
