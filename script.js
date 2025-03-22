@@ -38,7 +38,7 @@ let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affi
 let talk_info = {}, all_data, global_data, reports_data, prd_data, current_selection = undefined;
 
 let server_list = [
-  'https://quact-server.yiren.lu',
+  'https://quactserver2.yiren.lu',
 ];
 
 let fetch_interval_id;
@@ -459,15 +459,18 @@ function start_generate(type) {
       },
       success: function (data) {
         console.log(data);
-        localStorage.setItem('__editor_content', data['txt'])
-        localStorage.setItem('title', data['header'])
-        localStorage.setItem('desc', data['info'])
+        if (type == 'wechat') {
+          localStorage.setItem('__editor_content', data['txt'])
+          localStorage.setItem('title', data['header'])
+          localStorage.setItem('desc', data['info'])
 
-        window.open('/md');
-        if (data === "started") {
-          alert("generating started");
-        } else if (data == "working") {
-          alert("already generating");
+          window.open('/md');
+        } else {
+          if (data === "started") {
+            alert("generating started");
+          } else if (data == "working") {
+            alert("already generating");
+          }
         }
       },
       error: function (data) {
