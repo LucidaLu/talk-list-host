@@ -458,12 +458,12 @@ function start_generate(type) {
         bio_mode: $('input[name="inlineRadioOptions"]:checked').val()
       },
       success: function (data) {
-        console.log(data);
-        if (type == 'wechat') {
+        console.log(data, type);
+        if (type == 'markdown') {
           localStorage.setItem('__editor_content', data['txt'])
           localStorage.setItem('title', data['header'])
           localStorage.setItem('desc', data['info'])
-
+          console.log('work');
           window.open('/md');
         } else {
           if (data === "started") {
