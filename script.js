@@ -624,8 +624,8 @@ function generate_mail() {
   s += `<table style="border-collapse: collapse;border-spacing: 0;empty-cells: show;border: 1px solid #cbcbcb;"><thead style="background-color: #e0e0e0;color: #000;text-align: left;vertical-align: bottom;"><tr><th ${TH_STYLE}>半小时报告</th><th ${TH_STYLE}>paper reading</td></tr></thead><tbody>${table}</tbody></table>`;
   s += `<p>&nbsp;</p>`;
 
-  s += `<p ${P_STYLE}>请paper reading和组会30分钟的同学提前准备好材料并上传到坚果云中。</p>`;
-
+  s += `<p ${P_STYLE}>本周paper reading和组会30分钟的同学请<span style="color:red">提前准备好材料并上传到坚果云</span>。</p>`;
+  s += `<p ${P_STYLE}>下周paper reading的同学请在<span style="color:red">本周日之前</span>将<span style="color:red">论文链接和总结文件</span>发给学生组长。</p>`;
   s += `<p ${P_STYLE}>另外，<span style="color:red">请大家及时将周报提交给对应老师，并在本周周报进行更新。</span></p>`;
 
   s += `<p>&nbsp;</p>`;
