@@ -32,7 +32,7 @@
         <strong>地&nbsp;&nbsp;点</strong>
       </td>
       <td style="line-height: 1.75;border-color: rgb(0, 0, 0);border-width:0;padding: 0;color: rgb(0, 0, 0);vertical-align: top;">
-        {{room}}<br>腾讯会议号：605 5793 9921，密码：图灵机被提出的年份（4位）<br>B站直播网址：https://live.bilibili.com/22528138</td>
+        {{room}}<br>腾讯会议号：605 5793 9921，密码：图灵机被提出的年份（4位）</td>
     </tr>
     <tr>
       <td style="line-height: 1.75;border-color: rgb(0, 0, 0);border-width:0;padding: 0;color: rgb(0, 0, 0);vertical-align: top;">
@@ -86,6 +86,7 @@
   <strong>同量子，共发展</strong>
 </p>
 </section>
+
 
 
 
