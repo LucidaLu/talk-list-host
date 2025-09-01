@@ -21,7 +21,7 @@
   <tbody>
     <tr>
       <td
-        style="line-height: 1.75;border-color: rgb(0, 0, 0);border-width:0;padding: 0;padding-right:10px;color: rgb(0, 0, 0);width: 50px">
+        style="line-height: 1.75;border-color: rgb(0, 0, 0);border-width:0;padding: 0;padding-right:10px;color: rgb(0, 0, 0)" data-colwidth="57" width="57">
         <strong>时&nbsp;&nbsp;间</strong>
       </td>
       <td style="line-height: 1.75;border-color: rgb(0, 0, 0);border-width:0;padding: 0;color: rgb(0, 0, 0);vertical-align: top;">
@@ -86,5 +86,6 @@
   <strong>同量子，共发展</strong>
 </p>
 </section>
+
 
 
