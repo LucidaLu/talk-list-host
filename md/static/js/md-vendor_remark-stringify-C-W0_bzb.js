@@ -1,0 +1,1 @@
+import{t as i}from"./md-vendor_mdast-util-to-markdown-BjD_ZV8S.js";function e(n){const t=this;t.compiler=o;function o(r){return i(r,{...t.data("settings"),...n,extensions:t.data("toMarkdownExtensions")||[]})}}export{e as r};
