@@ -5,7 +5,7 @@
 <section
   style="color: rgb(0, 0, 0);font-family: Arial;font-size: 15px;letter-spacing: normal;text-align: start;text-wrap: wrap;padding-right: 0px;padding-left: 0px;margin:0;background: #0071bc;color:white;padding:15px;margin-bottom:0px">
 
-跟大家分享<strong>{{date}}</strong>的<span style="color:yellow"><strong>QuACT 学术前沿讲座-第{{id}}期</strong></span>，这次讲座将于{{room}}举办，同时也会在腾讯会议和 B 站同步直播，非常期待大家积极参与！
+跟大家分享<strong>{{date}}</strong>的<span style="color:yellow"><strong>QuACT 学术前沿讲座-第{{id}}期</strong></span>，这次讲座将于{{room}}举办，同时也会在腾讯会议直播，非常期待大家积极参与！
 
 </section>
 
@@ -86,6 +86,7 @@
   <strong>同量子，共发展</strong>
 </p>
 </section>
+
 
 
 
