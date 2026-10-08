@@ -34,6 +34,7 @@ function copyTextToClipboard(text) {
 }
 
 let talk_list_header = ['id', 'type', 'date', 'time', 'room', 'presenter', 'affiliation', 'summarizer', 'wechat-link'];
+const MIN_TALK_RECORDS = 200;
 
 let talk_info = {}, all_data, global_data, reports_data, prd_data, current_selection = undefined;
 
@@ -85,6 +86,18 @@ let mon_tab_changes = false;
 function load_data(data) {
   mon_tab_changes = false;
   all_data = JSON.parse(data);
+  // Add backing records for editable rows without replacing existing talks.
+  for (let i = 0; i < MIN_TALK_RECORDS; i++) {
+    if (!all_data["talks"][i]) {
+      all_data["talks"][i] = {
+        title: "",
+        abstract: "",
+        bio: "",
+        pic: "",
+        "pic-prev": ""
+      };
+    }
+  }
   global_data = all_data["talks"];
   for (let i in global_data) {
     for (let j in talk_list_header) {
